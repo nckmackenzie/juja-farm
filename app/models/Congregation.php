@@ -62,7 +62,8 @@ class Congregation {
         $this->db->bind(':addr',!empty($data['address']) ? strtolower($data['address']) : NULL);
         $this->db->bind(':abt',!empty($data['aboutus']) ? strtolower($data['aboutus']) : NULL);
         $this->db->bind(':isp',0);
-        $this->db->bind(':prefix',!empty($data['prefix']) ? strtolower($data['prefix']) : NULL);$this->db->bind(':idate',!empty($data['inauguration']) ? $data['inauguration'] : NULL);
+        $this->db->bind(':prefix',!empty($data['prefix']) ? strtolower($data['prefix']) : NULL);
+        $this->db->bind(':idate',!empty($data['inauguration']) ? $data['inauguration'] : NULL);
         $this->db->bind(':stype',$data['type']);
         $this->db->bind(':ystarted',(int)$data['started']);
         $this->db->bind(':stone',!empty($data['foundation']) ? $data['foundation'] : NULL);
