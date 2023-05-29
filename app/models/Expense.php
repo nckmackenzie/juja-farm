@@ -227,7 +227,7 @@ class Expense {
             $this->db->dbh->beginTransaction();
             $this->db->query('UPDATE tblexpenses SET fiscalYearId=:fid,expenseType=:etype,expenseDate
                                      =:edate,accountId=:aid,groupId=:gid,paymethodId=:pid,deductfrom=:dfrom,bankId=:bid
-                                     ,amount=:amount,narration=:narr,paymentReference=:ref
+                                     ,amount=:amount,narration=:narr,paymentReference=:ref,hasAttachment=:has,fileName=:fname
                               WHERE (ID=:id)');
             $this->db->bind(':fid',$fid);                        
             $this->db->bind(':etype',$data['expensetype']);                        
@@ -239,7 +239,9 @@ class Expense {
             $this->db->bind(':bid',$data['bank']);                        
             $this->db->bind(':amount',$data['amount']);                        
             $this->db->bind(':narr',strtolower($data['description']));                        
-            $this->db->bind(':ref',strtolower($data['reference']));                        
+            $this->db->bind(':ref',strtolower($data['reference']));
+            $this->db->bind(':has',$data['hasattachment']);   //to add                     
+            $this->db->bind(':fname',$data['hasattachment'] === 1 ? $data['filename'] : NULL);                        
             $this->db->bind(':id',$data['id']); 
             $this->db->execute();
             

@@ -127,17 +127,19 @@ class Expenses extends Controller{
             $fileTmpName = '';
             $fileDesination = '';
             
-            if ($data['file'] && $data['file']['size'] > 0) {
-                $fileName = $data['file']['name'];
-                $fileTmpName = $data['file']['tmp_name'];
-                $fileSize = $data['file']['size'];
-                $fileError = $data['file']['error'];
+            if ($_FILES['file']['size'] > 0) {
+              
+                $fileName = $_FILES['file']['name'];
+                $fileTmpName = $_FILES['file']['tmp_name'];
+                $fileSize = $_FILES['file']['size'];
+                $fileError = $_FILES['file']['error'];
 
                 $fileExt = explode('.', $fileName);
                 $fileActualExt = strtolower(end($fileExt));
                 $allowed = array('jpg','jpeg','png','pdf');
 
                 if (in_array($fileActualExt,$allowed)) {
+                    
                     if ($fileError === 0) {
                       if ($fileSize < 1000000) {
                         $fileNameNew = uniqid('',true).'.'.$fileActualExt;
@@ -151,9 +153,10 @@ class Expenses extends Controller{
                     }else {
                         $data['filename_err']= 'An error occurred during file upload';
                     }
-                  }else{
+                }else{
                     $data['filename_err'] = 'Invalid File Type';
-                  }
+                }
+            }
             }
             
             if (empty($data['date'])) {
@@ -241,7 +244,7 @@ class Expenses extends Controller{
          flash('contribution_msg','Cannot edit transactions for closed year','alert custom-danger alert-dismissible fade show');
          redirect('contributions');
          exit;
-       endif; 
+        endif; 
         $data = [
             'expense' => $expense,
             'voucher' => '',
@@ -259,6 +262,8 @@ class Expenses extends Controller{
             'amount' => '',
             'reference' => '',
             'description' => '',
+            'has_attachment' => converttobool($expense->hasAttachment),
+            'filename' => $expense->fileName,
             'date_err' => '',
             'amount_err' => '',
             'ref_err' => '',
@@ -286,12 +291,52 @@ class Expenses extends Controller{
                 'amount' => trim($_POST['amount']),
                 'reference' => trim($_POST['reference']),
                 'description' => trim($_POST['description']),
+                'file' => isset($_FILE) ? $_FILES['file'] : false,
+                'filename' => '',
+                'hasattachment' => 0,
                 'date_err' => '',
                 'amount_err' => '',
                 'ref_err' => '',
                 'desc_err' => '',
-                'bank_err' => ''
+                'bank_err' => '',
+                'filename_err' => ''
             ];
+
+            $fileTmpName = '';
+            $fileDesination = '';
+            
+            
+            if ($_FILES['file']['size'] > 0) {
+              
+                $fileName = $_FILES['file']['name'];
+                $fileTmpName = $_FILES['file']['tmp_name'];
+                $fileSize = $_FILES['file']['size'];
+                $fileError = $_FILES['file']['error'];
+
+                $fileExt = explode('.', $fileName);
+                $fileActualExt = strtolower(end($fileExt));
+                $allowed = array('jpg','jpeg','png','pdf');
+
+                if (in_array($fileActualExt,$allowed)) {
+                    
+                    if ($fileError === 0) {
+                      if ($fileSize < 1000000) {
+                        $fileNameNew = uniqid('',true).'.'.$fileActualExt;
+                        $data['filename'] = $fileNameNew;
+                        $des = getcwd();
+                        $fileDesination = $des.'/img/'.$fileNameNew;
+                        $data['hasattachment'] = 1;
+                      }else {
+                          $data['filename_err'] = "File size is too big";
+                      }
+                    }else {
+                        $data['filename_err']= 'An error occurred during file upload';
+                    }
+                }else{
+                    $data['filename_err'] = 'Invalid File Type';
+                }
+            }
+
             if (empty($data['date'])) {
                 $data['date_err'] = 'Select Date';
             }
@@ -309,14 +354,32 @@ class Expenses extends Controller{
             }
             if (empty($data['date_err']) && empty($data['amount_err']) && empty($data['ref_err']) 
                 && empty ($data['desc_err']) && empty($data['bank_err'])) {
-                if ($this->expenseModel->update($data)) {
-                    flash('expense_msg',"Expense Updated Successfully!");
-                    redirect('expenses');
+                
+                if($data['hasattachment'] === 0){
+                    if ($this->expenseModel->update($data)) {
+                        flash('expense_msg',"Expense Updated Successfully!");
+                        redirect('expenses');
+                    }
+                    else{
+                        flash('expense_msg',"Something Went Wrong!",'alert custom-danger');
+                        redirect('expenses');
+                    }
+                }else{
+                    if (move_uploaded_file($fileTmpName,$fileDesination)) {
+                        if ($this->expenseModel->update($data)) {
+                            flash('expense_msg',"Expense updated Successfully!");
+                            redirect('expenses');
+                        }
+                        else{
+                            flash('expense_msg',"Expense wasnt updated!",'alert custom-danger');
+                            redirect('expenses');
+                        }
+                    }else {
+                        flash('expense_msg','Something went wrong with file upload','alert custom-danger');
+                        redirect('expenses');
+                    }
                 }
-                else{
-                    flash('expense_msg',"Something Went Wrong!",'alert custom-danger');
-                    redirect('expenses');
-                }
+                
             }
             else{
                 $this->view('expenses/edit',$data);

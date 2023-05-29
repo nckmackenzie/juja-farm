@@ -5,6 +5,7 @@ const expenseTypeSelect = document.getElementById('expensetype');
 const costCenterSelect = document.getElementById('costcentre');
 const paymethodSelect = document.getElementById('paymethod');
 const cashtypeSelect = document.getElementById('cashtype');
+const attachInput = document.getElementById('attachment');
 const expenseRoute = `${HOST_URL}/expenses`;
 
 paymethodSelect.addEventListener('change', function (e) {
@@ -37,6 +38,10 @@ accountSelect.addEventListener('change', async function (e) {
   if (await checkOverSpent()) {
     $('#alertModal').modal('show');
   }
+});
+
+attachInput.addEventListener('change', () => {
+  document.querySelector('.filename').textContent = attachInput.files[0].name;
 });
 
 async function checkOverSpent() {

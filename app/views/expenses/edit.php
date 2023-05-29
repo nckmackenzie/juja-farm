@@ -20,7 +20,7 @@
                 <div class="card bg-light">
                     <div class="card-header">Edit Expense</div>
                     <div class="card-body">
-                        <form action="<?php echo URLROOT;?>/expenses/update" method="post">
+                        <form action="<?php echo URLROOT;?>/expenses/update" method="post" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -167,6 +167,25 @@
                                     </div>
                                 </div>
                             </div><!--End Of Row -->
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="attachment">Attach Receipt</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="attachment" name="file">
+                                        <label class="custom-file-label" for="customFile">Choose file (Less than 1MB)</label>
+                                    </div>
+                                    <span class="filename"></span>
+                                </div>
+                                <?php if($data['has_attachment']) : ?>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <label style="color:aliceblue">preview</label>
+                                            <a target="_blank" href="<?php echo URLROOT;?>/img/<?php echo $data['filename'];?>" class="btn btn-info btn-sm d-block">Preview</a>             
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            
                             <div class="row">
                                 <div class="col-4">
                                     <button type="submit" class="btn btn-sm bg-navy custom-font">Save</button>

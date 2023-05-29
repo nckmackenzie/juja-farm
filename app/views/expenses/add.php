@@ -42,7 +42,7 @@
                 <div class="card bg-light">
                     <div class="card-header">Add Expense</div>
                     <div class="card-body">
-                        <form action="<?php echo URLROOT;?>/expenses/create" method="post">
+                        <form action="<?php echo URLROOT;?>/expenses/create" method="post" enctype="multipart/form-data">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -186,6 +186,7 @@
                                         <input type="file" class="custom-file-input" id="attachment" name="file">
                                         <label class="custom-file-label" for="customFile">Choose file (Less than 1MB)</label>
                                     </div>
+                                    <span class="filename"></span>
                                 </div>
                             </div>
                             <div class="row">
