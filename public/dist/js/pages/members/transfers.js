@@ -15,7 +15,7 @@ const newCongSelect = document.getElementById('newcongregation');
 const newDistrictSelect = document.getElementById('newdistrict');
 const form = document.getElementById('transferForm');
 const dateInput = document.getElementById('date');
-const controls = document.querySelectorAll('.form-control');
+const controls = document.querySelectorAll('.mandatory');
 
 currCongSelect.addEventListener('change', async function (e) {
   if (!e.target.value || e.target.value === '') return;
