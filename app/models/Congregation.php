@@ -47,12 +47,15 @@ class Congregation {
     }
     public function create($data)
     {
-        $this->db->query('INSERT INTO tblcongregation (ParishName,CongregationName,contact,email,`Address`
+        $lastid = getdbvalue($this->db->dbh,'SELECT ID FROM `tblcongregation` ORDER BY ID DESC LIMIT 1',[]);
+        $newid = $lastid + 1;
+        $this->db->query('INSERT INTO tblcongregation (ID,ParishName,CongregationName,contact,email,`Address`
                                       ,AboutUs,IsParish,prefix,InaugurationDate,SactuaryType,YearStarted,
                                       FoundationStone,DedicationDate)
-                          VALUES(:pname,:cname,:cont,:email,:addr,:abt,:isp,:prefix,:idate,:stype,:ystarted,
+                          VALUES(:id,:pname,:cname,:cont,:email,:addr,:abt,:isp,:prefix,:idate,:stype,:ystarted,
                                  :stone,:dedicated)');
-        $this->db->bind(':pname','kalimoni parish');
+        $this->db->bind(':id',$newid);
+        $this->db->bind(':pname','juja farm parish');
         $this->db->bind(':cname',strtolower($data['congregationname']));
         $this->db->bind(':cont',!empty($data['contact']) ? $data['contact'] : NULL);
         $this->db->bind(':email',!empty($data['email']) ? $data['email'] : NULL);

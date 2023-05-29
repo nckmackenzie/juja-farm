@@ -9,7 +9,7 @@ define('APPROOT',dirname(dirname(__FILE__)));
 //url root
 define('URLROOT','http://localhost/cms');
 //SITE NAME
-define('SITENAME','Kenyatta Rd Parish');
+define('SITENAME','Juja Farm Parish');
 define('ENVIRONMENT','production');
 //SMS API VARS
 define('USER_SMS','jujafarmcms');
