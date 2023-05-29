@@ -56,7 +56,7 @@
                                     <label for="prefix">Prefix</label>
                                     <input type="text" id="prefix" name="prefix"
                                     value="<?php echo $data['prefix'];?>"
-                                    class="form-control form-control-sm" autocomplete="off">
+                                    class="form-control form-control-sm" autocomplete="off" placeholder="eg JF/MW">
                                 </div>
                             </div>
                             <div class="col-md-6">
