@@ -15,19 +15,19 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="userid">UserID</label>
-                                    <input type="text" name="userid"
+                                    <input type="text" name="userid" id="userid"
                                     class="form-control form-control-sm 
                                     <?php echo (!empty($data['userid_err'])) ? 'is-invalid' : ''?>"
                                     value="<?php echo !empty($data['userid']) ? $data['userid'] 
                                             : strtoupper($data['user']->UserID);?>" 
-                                    autocomplete="off"
-                                    readonly>
+                                    autocomplete="off">
+                                    <span class="invalid-feedback"><?php echo $data['userid_err'];?></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="username">User Name</label>
-                                    <input type="text" name="username"
+                                    <input type="text" name="username" id="username"
                                     class="form-control form-control-sm mandatory
                                     <?php echo (!empty($data['username_err'])) ? 'is-invalid' : ''?>"
                                     value="<?php echo !empty($data['username']) ? $data['username'] : strtoupper($data['user']->UserName);?>"
@@ -71,7 +71,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="contact">Contact</label>
-                                    <input type="text" name="contact"
+                                    <input type="text" name="contact" id="contact"
                                     class="form-control form-control-sm mandatory
                                     <?php echo (!empty($data['contact_err'])) ? 'is-invalid' : ''?>"
                                     value="<?php echo !empty($data['contact']) ? $data['contact'] : $data['user']->contact;?>"

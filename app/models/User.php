@@ -230,9 +230,10 @@ class User {
     public function update($data)
     {
        
-        $this->db->query('UPDATE tblusers SET UserName=:uname,UsertypeId=:utype,Active=:act,
+        $this->db->query('UPDATE tblusers SET UserID=:userid,UserName=:uname,UsertypeId=:utype,Active=:act,
                                  contact=:contact,districtId=:district
                           WHERE  (ID=:id)');
+        $this->db->bind(':userid',$data['userid']);                   
         $this->db->bind(':uname',$data['username']);
         $this->db->bind(':utype',$data['usertype']);
         $this->db->bind(':act',$data['active']);

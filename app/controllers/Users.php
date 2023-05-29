@@ -84,7 +84,7 @@ class Users extends Controller{
                 $hashed =  password_hash($random,PASSWORD_DEFAULT);
                 //register
                 if ($this->userModel->create($data,$hashed)) {
-                    $msg = 'Hi to access the PCEA Kalimoni System,click on the link provided herein.Login Credentials are: UserID is '.$data['userid'] . ' Password is '.$random.' then select your congregation from the dropdown. https://pceakalimoniparish.or.ke/app';
+                    $msg = 'Hi to access the PCEA Juja Farm System,click on the link provided herein.Login Credentials are: UserID is '.$data['userid'] . ' Password is '.$random.' then select your congregation from the dropdown. https://pceajujafarmparish.or.ke/users';
                     $countryPrexix ='+254';
                     $sb = substr($data['contact'],1);
                     $full = $countryPrexix . $sb;
@@ -386,6 +386,7 @@ class Users extends Controller{
             'active' => '',
             'contact' => '',
             'district' => '',
+            'userid_err' =>'',
             'username_err' =>'',
             'usertype_err' =>'',
             'district_err' =>'',
@@ -404,6 +405,7 @@ class Users extends Controller{
                 'user => '
 ,               'id' => trim($_POST['id']),
                 'districts' => $districts,
+                'userid' => $_POST['userid'],
                 'username' => trim(strtolower($_POST['username'])),
                 'usertype' => $_POST['usertype'],
                 'active' => $_POST['active'],
@@ -416,6 +418,10 @@ class Users extends Controller{
             ];
             $user = $this->userModel->getUser(encryptId($data['id']));
             $data['user'] = $user;
+
+            if (empty($data['userid'])) {
+                $data['userid_err'] = 'Enter User ID';
+            }
             if (empty($data['username'])) {
                 $data['username_err'] = 'Enter User Name';
             }
