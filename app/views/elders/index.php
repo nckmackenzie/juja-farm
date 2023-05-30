@@ -48,21 +48,18 @@
                     <thead class="bg-navy">
                         <th class="d-none">ID</th>
                         <th>Elder Name</th>
-                        <th>Current Congregation</th>
-                        <th>Current District</th>
+                        <th>Contact</th>
                         <th>Actions</th>
                     </thead>
                     <tbody>
                         <?php foreach($data['elders'] as $elder) :?>
                             <tr>
                                 <td class="d-none"><?php echo $elder->ID;?></td>
-                                <td><?php echo $elder->ElderName;?></td>
-                                <td><?php echo $elder->Congregation;?></td>
-                                <td><?php echo $elder->District;?></td>
+                                <td><?php echo ucwords($elder->ElderName);?></td>
+                                <td><?php echo $elder->Contact;?></td>
                                 <td>
                                     <?php if($_SESSION['userType'])  : ?>
                                         <div class="btn-group">
-                                            <a href="<?php echo URLROOT;?>/elders/edit/<?php echo $elder->ID;?>" class="btn btn-sm bg-olive custom-font">Edit</a>
                                             <a href="<?php echo URLROOT;?>/elders/transfer/<?php echo $elder->ID;?>" class="btn btn-sm btn-info custom-font">Transfer</a>
                                             <button type="button" class="btn btn-sm btn-danger custom-font btndel">Delete</button>
                                         </div>
@@ -82,14 +79,14 @@
 <?php require APPROOT . '/views/inc/footer.php'?>
 <script>
     $(function(){
-      $('#reqTable').DataTable({
+      $('#elderTable').DataTable({
           'ordering' : false,
           'columnDefs' : [
-            {"width" : "15%" , "targets": 4}
+            {"width" : "15%" , "targets": 3}
           ]
       });
 
-      $('#reqTable').on('click','.btndel',function(){
+      $('#elderTable').on('click','.btndel',function(){
           $('#deleteModalCenter').modal('show');
           $tr = $(this).closest('tr');
 
