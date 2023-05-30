@@ -186,4 +186,21 @@ class Elders extends Controller
             redirect('elders');
         }
     }
+
+    public function delete()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            $id = (int)trim($_POST['id']);
+            if(!$this->eldermodel->Delete($id))
+            {
+                flash('elder_msg',"Elder Transfered Successfully!",'alert custom-danger alert-dismissible fade show');
+                redirect('elders');
+                exit;
+            }
+
+            flash('elder_msg',"Elder Transfered Successfully!");
+            redirect('elders');
+        }
+    }
 }

@@ -125,4 +125,34 @@ class Elder
             return false;
         }
     }
+
+    public function Delete($id)
+    {
+        try {
+            
+            $this->db->dbh->beginTransaction();
+
+            $this->db->query('UPDATE tblelders SET Deleted=1 WHERE (ID=:id)');
+            $this->db->bind(':id',$id);
+            $this->db->execute();
+
+            $this->db->query('UPDATE tblusers SET Active=0 WHERE (TransferId=:tid)');
+            $this->db->bind(':tid',$id);
+            $this->db->execute();
+          
+            if ($this->db->dbh->commit()) {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
+            return false;
+        }
+    }
 }
