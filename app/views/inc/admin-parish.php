@@ -57,6 +57,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?php echo URLROOT;?>/elders" class="nav-link">
+                        <p>Elders</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?php echo URLROOT;?>/groups" class="nav-link">
                         <p>Groups</p>
                     </a>
