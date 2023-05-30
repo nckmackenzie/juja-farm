@@ -64,4 +64,10 @@ class Reusables
         return getdbvalue($this->db->dbh,$sql,[(int)$id]);
     }
 
+    public function GetRoles()
+    {
+        $sql = 'SELECT ID,RoleName FROM tblroles WHERE (deleted = 0) ORDER BY RoleName';
+        return loadresultset($this->db->dbh,$sql,[]);
+    }
+
 }
