@@ -12,6 +12,11 @@ class Elder
         return getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tblrolerights WHERE RoleId=?',[(int)$role]);
     }
 
+    public function GetElders()
+    {
+        return loadresultset($this->db->dbh,'SELECT * FROM vw_elders ORDER BY ElderName',[]);
+    }
+
     public function Create($data)
     {
         try {
@@ -71,6 +76,53 @@ class Elder
     {
         if(!$data['isedit']){
            return $this->Create($data);
+        }
+    }
+
+    public function GetElderDetails($id)
+    {
+        $name = getdbvalue($this->db->dbh,'SELECT ElderName FROM tblelders WHERE ID=?',[$id]);
+        $oldcong = getdbvalue($this->db->dbh,'SELECT ToCongregation FROM tbleldermovement WHERE ElderId=? ORDER BY ID DESC LIMIT 1',[$id]);
+        $olddist = getdbvalue($this->db->dbh,'SELECT ToDistrict FROM tbleldermovement WHERE ElderId=? ORDER BY ID DESC LIMIT 1',[$id]);
+        $oldcongname = getdbvalue($this->db->dbh,'SELECT getcongregationname(?)',[$oldcong]);
+        $olddistname = getdbvalue($this->db->dbh,'SELECT getdistrictname(?)',[$olddist]);
+        return [$oldcong,$olddist,$oldcongname,$olddistname,$name];
+    }
+
+    public function Transfer($data)
+    {
+        try {
+            
+            $this->db->dbh->beginTransaction();
+
+            $this->db->query('INSERT INTO tbleldermovement (ElderId,FromCongregation,ToCongregation,FromDistrict,ToDistrict,TransferDate) VALUES(:eid,:fcong,:cong,:fdist,:dist,:tdate)');
+            $this->db->bind(':eid',$data['elderid']);
+            $this->db->bind(':fcong',$data['oldcongregation']);
+            $this->db->bind(':cong',$data['congregation']);
+            $this->db->bind(':fdist',$data['olddistrict']);
+            $this->db->bind(':dist',$data['district']);
+            $this->db->bind(':tdate',$data['date']);
+            $this->db->execute();
+
+            $this->db->query('UPDATE tblusers SET districtId=:district,CongregationId=:cong WHERE (TransferId=:tid)');
+            $this->db->bind(':district',$data['district']);
+            $this->db->bind(':cong',$data['congregation']);
+            $this->db->bind(':tid',$data['elderid']);
+            $this->db->execute();
+          
+            if ($this->db->dbh->commit()) {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
+            return false;
         }
     }
 }

@@ -18,7 +18,7 @@ class Elders extends Controller
 
     public function index()
     {
-        $data = ['elders' => []];
+        $data = ['elders' => $this->eldermodel->GetElders()];
         $this->view('elders/index',$data);
     }
 
@@ -112,6 +112,78 @@ class Elders extends Controller
         {
             redirect('users/deniedaccess');
             exit;
+        }
+    }
+
+    public function transfer($id)
+    {
+        $elderdetails = $this->eldermodel->GetElderDetails($id);
+        $data = [
+            'title' => 'Transfer Elder',
+            'elderid' => $id,
+            'oldcongregation' => strtoupper($elderdetails[0]),
+            'olddistrict' => strtoupper($elderdetails[1]),
+            'oldcongregationname' => strtoupper($elderdetails[2]),
+            'olddistrictname' => strtoupper($elderdetails[3]),
+            'congregations' => $this->reusemodel->GetCongregations(),
+            'name' => strtoupper($elderdetails[4]),
+            'congregation' => '',
+            'reason' => '',
+            'district' => '',
+            'date' => date('Y-m-d'),
+            'errmsg' => [],
+        ];
+        $this->view('elders/transfer',$data);
+    }
+
+    public function createtransfer()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            $elderdetails = $this->eldermodel->GetElderDetails($_POST['elderid']);
+            $data = [
+                'title' => 'Transfer Elder',
+                'elderid' => $_POST['elderid'],
+                'oldcongregation' => strtoupper($elderdetails[0]),
+                'olddistrict' => strtoupper($elderdetails[1]),
+                'oldcongregationname' => strtoupper($elderdetails[2]),
+                'olddistrictname' => strtoupper($elderdetails[3]),
+                'congregations' => $this->reusemodel->GetCongregations(),
+                'name' => strtoupper($elderdetails[4]),
+                'congregation' => isset($_POST['congregation']) && !empty(trim($_POST['congregation'])) ? (int)trim($_POST['congregation']) : null,
+                'reason' => isset($_POST['reason']) && !empty(trim($_POST['reason'])) ? trim($_POST['reason']) : null,
+                'district' => isset($_POST['district']) && !empty(trim($_POST['district'])) ? (int)trim($_POST['district']) : null,
+                'date' => isset($_POST['date']) && !empty(trim($_POST['date'])) ? date('Y-m-d',strtotime($_POST['date'])) : null,
+                'errmsg' => [],
+            ];
+
+            if(is_null($data['congregation'])){
+                array_push($data['errmsg'],'Select congregation');
+            }
+            if(is_null($data['district'])){
+                array_push($data['errmsg'],'Select district');
+            }
+            if(is_null($data['date'])){
+                array_push($data['errmsg'],'Select date');
+            }
+            if(!is_null($data['date']) && $data['date'] > date('Y-m-d')){
+                array_push($data['errmsg'],'Invalid date selected');
+            }
+
+            if(count($data['errmsg']) > 0){
+                $this->view('elders/transfer',$data);
+                exit;
+            }
+
+            if(!$this->eldermodel->Transfer($data))
+            {
+                array_push($data['errmsg'],'Unable to transfer. Retry or contact admin');
+                $this->view('elders/transfer',$data);
+                exit;
+            }
+
+            flash('elder_msg',"Elder Transfered Successfully!");
+            redirect('elders');
         }
     }
 }
