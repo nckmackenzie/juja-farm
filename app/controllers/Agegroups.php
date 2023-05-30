@@ -13,7 +13,7 @@ class Agegroups extends Controller{
     {
         $groups = $this->agegroupModel->index();
         $data = ['groups' => $groups];
-        $this->view('age_groups/index',$data);
+        $this->view('agegroups/index',$data);
     }
     public function add()
     {
@@ -25,7 +25,7 @@ class Agegroups extends Controller{
             'from_err' => '',
             'to_err' => ''
         ];
-        $this->view('age_groups/add',$data);
+        $this->view('agegroups/add',$data);
     }
     public function create()
     {
@@ -56,14 +56,14 @@ class Agegroups extends Controller{
             if (empty($data['name_err']) && empty($data['from_err']) && empty($data['to_err'])) {
                 if ($this->agegroupModel->create($data)) {
                     flash('agegroup_msg','Age Group Created Successfully!');
-                    redirect('age_groups');
+                    redirect('agegroups');
                 }else {
                     flash('agegroup_msg','Something Went Wrong!','alert custom-danger');
-                    redirect('age_groups');
+                    redirect('agegroups');
                 }
             }
             else{
-                $this->view('age_groups/add',$data);
+                $this->view('agegroups/add',$data);
             }
 
         }
@@ -76,7 +76,7 @@ class Agegroups extends Controller{
                 'from_err' => '',
                 'to_err' => ''
             ];
-            $this->view('age_groups/add',$data);
+            $this->view('agegroups/add',$data);
         }
     }
     public function edit($id)
@@ -95,7 +95,7 @@ class Agegroups extends Controller{
             redirect('mains');
         }
         else{
-            $this->view('age_groups/edit',$data);
+            $this->view('agegroups/edit',$data);
         }
     }
     public function update()
@@ -131,7 +131,7 @@ class Agegroups extends Controller{
                 }
             }
             else{
-                $this->view('age_groups/edit',$data);
+                $this->view('agegroups/edit',$data);
             }
 
         }
@@ -144,7 +144,7 @@ class Agegroups extends Controller{
                 'from_err' => '',
                 'to_err' => ''
             ];
-            $this->view('age_groups/edit',$data);
+            $this->view('agegroups/edit',$data);
         }
     }
     public function delete()
@@ -166,7 +166,7 @@ class Agegroups extends Controller{
                 }
             }
             else{
-                redirect('age_groups');
+                redirect('agegroups');
             }
         }
     }
