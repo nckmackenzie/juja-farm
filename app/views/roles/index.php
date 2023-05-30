@@ -58,8 +58,7 @@
                                 <td>
                                     <?php if($_SESSION['userType'] <=2) : ?>
                                         <div class="btn-group">
-                                            <a href="<?php echo URLROOT;?>/roles/edit/<?php echo $role->ID;?>" class="btn btn-sm bg-olive custom-font">Edit</a>
-                                            <button type="button" class="btn btn-sm btn-danger custom-font btndel">Delete</button>
+                                          <button type="button" class="btn btn-sm btn-danger custom-font btndel">Delete</button>
                                         </div>
                                     <?php endif; ?>
                                 </td>     
@@ -79,7 +78,7 @@
     $(function(){
       $('#roleTable').DataTable({
           'ordering' : false,
-          'columnDefs' : [{"width" : "40%" , "targets": 2}]
+          'columnDefs' : [{"width" : "20%" , "targets": 2}]
       });
 
       $('#roleTable').on('click','.btndel',function(){
