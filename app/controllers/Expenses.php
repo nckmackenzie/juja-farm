@@ -157,7 +157,7 @@ class Expenses extends Controller{
                     $data['filename_err'] = 'Invalid File Type';
                 }
             }
-            }
+            
             
             if (empty($data['date'])) {
                 $data['date_err'] = 'Select Date';
