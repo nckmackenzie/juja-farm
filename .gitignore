@@ -1,2 +1,3 @@
 app/helpers/AT
 public/plugins
+app/config/config.php
