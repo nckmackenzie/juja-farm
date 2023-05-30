@@ -62,7 +62,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?php echo URLROOT;?>/age_groups" class="nav-link">
+                    <a href="<?php echo URLROOT;?>/agegroups" class="nav-link">
                         <p>Age Groups</p>
                     </a>
                 </li>
