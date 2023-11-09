@@ -186,6 +186,12 @@ class Member {
             $this->db->bind(':id',$data['id']);
             $this->db->execute();
 
+            if($this->db->dbh->commit()){
+                return true;
+            }else{
+                return false;
+            }
+
         } catch (\Exception $e) {
             if ($this->db->dbh->inTransaction()) {
                 $this->db->dbh->rollBack();
