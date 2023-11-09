@@ -169,7 +169,8 @@ class Member {
     public function delete($data)
     {
         try {
-           
+            $this->db->dbh->beginTransaction();
+            
             $this->db->query('DELETE FROM tblgroupmembership WHERE (memberId=:id)');
             $this->db->bind(':id',$data['id']);
             $this->db->execute();
