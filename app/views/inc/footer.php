@@ -4,7 +4,7 @@
     <!-- Default to the left -->
     <strong
         >Copyright &copy; <?php echo date("Y");?>
-        <a href="#">Designed By Mack Softwares</a>.</strong
+        <a href="#">Designed By Nicholas Mackenzie</a>.</strong
     >
     All rights reserved.
 </footer>
