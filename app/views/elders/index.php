@@ -28,6 +28,32 @@
     </div>
   </div>
 </div>
+<div class="modal fade" id="resetModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Reset password</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form action="<?php echo URLROOT;?>/elders/reset" method="post">
+              <div class="row">
+                <div class="col-md-9">Reset the selected user's password?</label>
+                  <input type="hidden" name="id" id="resetid">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger">Yes</button>
+              </div>
+          </form>
+      </div>
+     
+    </div>
+  </div>
+</div>
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -60,7 +86,9 @@
                                 <td>
                                     <?php if($_SESSION['userType'])  : ?>
                                         <div class="btn-group">
-                                            <a href="<?php echo URLROOT;?>/elders/transfer/<?php echo $elder->ID;?>" class="btn btn-sm btn-info custom-font">Transfer</a>
+                                            
+                                            <a href="<?php echo URLROOT;?>/elders/transfer/<?php echo $elder->ID;?>" class="btn btn-sm btn-secondary custom-font">Transfer</a>
+                                            <button type="button" class="btn btn-sm btn-info custom-font btnreset">Reset Password</button>
                                             <button type="button" class="btn btn-sm btn-danger custom-font btndel">Delete</button>
                                         </div>
                                     <?php endif; ?>
@@ -82,7 +110,7 @@
       $('#elderTable').DataTable({
           'ordering' : false,
           'columnDefs' : [
-            {"width" : "15%" , "targets": 3}
+            {"width" : "30%" , "targets": 3}
           ]
       });
 
@@ -94,6 +122,16 @@
               return $(this).text();
           }).get();
           $('#id').val(data[0]);
+      });
+
+      $('#elderTable').on('click','.btnreset',function(){
+          $('#resetModalCenter').modal('show');
+          $tr = $(this).closest('tr');
+
+          let data = $tr.children('td').map(function(){
+              return $(this).text();
+          }).get();
+          $('#resetid').val(data[0]);
       });
     });
 </script>
