@@ -64,15 +64,24 @@
       <div class="container-fluid">
       <?php flash('member_msg');?>
         <div class="row mb-2">
-          <div class="col-sm-6">
+          <div class="col-sm-3">
             <a href="<?php echo URLROOT;?>/members/add" class="btn btn-success btn-sm custom-font">Add New</a>
           </div>
+          <?php if((int)$_SESSION['userType'] !== 4) : ?>
+            <div class="col-sm-3">
+              <select name="filter" id="filter" class="form-control form-control-sm">
+                <option value="" selected disabled>Filter by district</option>
+              
+              </select>
+            </div>
+          <?php endif; ?>
         </div>
       </div><!-- /.container-fluid -->
     </section>
     <!-- Main content -->
     <section class="content">
         <div class="row">
+          <div class="col-12" id='alertBox'></div>
             <div class="col-md-12 table-responsive">
                 <table id="membersTable" class="table table-bordered table-striped table-sm">
                     <thead class="bg-navy">
@@ -125,13 +134,30 @@
           'ordering' : false,
           "responsive": true,
           'columnDefs' : [
-            { "visible" : false, "targets": 0},
+            // { "visible" : false, "targets": 0},
             {"width" : "5%" , "targets": 2},
             {"width" : "10%" , "targets": 3}
             <?php if ($_SESSION['userType'] <=2) : ?>
             ,{"width" : "25%" , "targets": 6},
             <?php endif;?>
-          ]
+          ],
+          "initComplete": function () {
+          this.api().columns([4]).every(function () {
+            var column = this;
+            var select = $('#filter');
+
+            select.on('change', function () {
+                var val = $.fn.dataTable.util.escapeRegex(
+                    $(this).val()
+                );
+                column.search(val ? '^' + val + '$' : '', true, false).draw();
+            });
+
+            column.data().unique().sort().each(function (d, j) {
+                select.append('<option value="' + d + '">' + d + '</option>')
+            });
+          });
+        }
       });
 
       $('#membersTable').on('click','.btndel',function(){
