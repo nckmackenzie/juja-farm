@@ -1,5 +1,7 @@
 <?php
 class Members extends Controller {
+    private $authmodel;
+    private $memberModel;
     public function __construct()
     {
         if (!isset($_SESSION['userId'])) {
