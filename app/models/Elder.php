@@ -109,6 +109,14 @@ class Elder
         }
     }
 
+    public function GetElderContactAndId($id)
+    {
+        $contact = getdbvalue($this->db->dbh,'SELECT Contact FROM tblelders WHERE (ID=?)',[$id]);
+        $userid = getdbvalue($this->db->dbh,'SELECT ID FROM tblusers WHERE (contact=?)',[$contact]);
+        $username = getdbvalue($this->db->dbh,'SELECT UserID FROM tblusers WHERE (ID=?)',[$userid]);
+        return [substr($contact,1),$userid,$username];
+    }
+
     public function GetElderDetails($id)
     {
         $name = getdbvalue($this->db->dbh,'SELECT ElderName FROM tblelders WHERE ID=?',[$id]);

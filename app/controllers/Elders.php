@@ -3,6 +3,7 @@ class Elders extends Controller
 {
     private $eldermodel;
     private $authmodel;
+    private $usermodel;
     private $reusemodel;
     public function __construct()
     {
@@ -13,6 +14,7 @@ class Elders extends Controller
         $this->authmodel = $this->model('Auth');
         $this->eldermodel = $this->model('Elder');
         $this->reusemodel = $this->model('Reusables');
+        $this->usermodel = $this->model('User');
         checkrights($this->authmodel,'group fund requisition');
     }
 
@@ -117,6 +119,26 @@ class Elders extends Controller
         }
     }
 
+    public function edit($id)
+    
+    {
+        $data = [
+            'title' => 'Add Elder',
+            'congregations' => $this->reusemodel->GetCongregations(),
+            'roles' => $this->reusemodel->GetRoles(),
+            'id' => '',
+            'isedit' => false,
+            'name' => '',
+            'contact' => '',
+            'congregation' => '',
+            'district' => '',
+            'role' => '',
+            'date' => date('Y-m-d'),
+            'errmsg' => [],
+        ];
+        $this->view('elders/add',$data);
+    }
+
     public function transfer($id)
     {
         $elderdetails = $this->eldermodel->GetElderDetails($id);
@@ -182,6 +204,37 @@ class Elders extends Controller
                 array_push($data['errmsg'],'Unable to transfer. Retry or contact admin');
                 $this->view('elders/transfer',$data);
                 exit;
+            }
+
+            flash('elder_msg',"Elder Transfered Successfully!");
+            redirect('elders');
+        }
+    }
+
+    public function reset()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            $id = (int)trim($_POST['id']);
+            $contact = $this->eldermodel->GetElderContactAndId($id)[0];
+
+            $random = substr(md5(mt_rand()),0,7);
+            $hashed =  password_hash($random,PASSWORD_DEFAULT);
+            $userid = $this->eldermodel->GetElderContactAndId($id)[1];
+            $loginid = $this->eldermodel->GetElderContactAndId($id)[2];
+
+            $data = [
+                'id' => $userid,
+                'password' => $hashed
+            ];
+
+            if($this->usermodel->resetCredentials($data))
+            {
+                $message = 'Password Reset Successful! Your New Password Is '.$random .' and your User ID is '.$loginid.' Click on the provided link to log in. ' . URLROOT . '/users';
+                $full = '+254' . $contact;
+                sendgeneral($full,$message);
+                flash('elder_msg',"Password reset Successfully!");
+                redirect('elders');
             }
 
             flash('elder_msg',"Elder Transfered Successfully!");
