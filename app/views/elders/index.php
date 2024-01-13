@@ -86,7 +86,7 @@
                                 <td>
                                     <?php if($_SESSION['userType'])  : ?>
                                         <div class="btn-group">
-                                            
+                                            <a href="<?php echo URLROOT;?>/elders/edit/<?php echo $elder->ID;?>" class="btn btn-sm btn-success custom-font">Edit</a>
                                             <a href="<?php echo URLROOT;?>/elders/transfer/<?php echo $elder->ID;?>" class="btn btn-sm btn-secondary custom-font">Transfer</a>
                                             <button type="button" class="btn btn-sm btn-info custom-font btnreset">Reset Password</button>
                                             <button type="button" class="btn btn-sm btn-danger custom-font btndel">Delete</button>
