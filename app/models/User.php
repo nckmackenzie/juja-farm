@@ -32,7 +32,7 @@ class User {
     {
         $this->db->query('SELECT superUser FROM tblusers WHERE (UserID=:id)');
         $this->db->bind(':id',$userid);
-        if($this->db->getValue == 1){
+        if($this->db->getValue() == 1){
             return true;
         }else{
             return false;
