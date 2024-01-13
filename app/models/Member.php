@@ -183,17 +183,48 @@ class Member {
     }
     public function delete($data)
     {
-        $this->db->query('UPDATE tblmember SET deleted=:del WHERE (ID=:id)');
-        $this->db->bind(':del',$_SESSION['one']);
-        $this->db->bind(':id',$data['id']);
-        if ($this->db->execute()) {
-            $act ='Updated Member '.$data['name'];
-            $this->createLog($this->db,$act);
-            return true;
+        try {
+            $this->db->dbh->beginTransaction();
+            
+            $this->db->query('DELETE FROM tblgroupmembership WHERE (memberId=:id)');
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+            $this->db->query('DELETE FROM tblmembertransfers WHERE (memberId=:id)');
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+            $this->db->query('DELETE FROM tblmember_family WHERE (memberId=:id)');
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+            $this->db->query('DELETE FROM tblmember WHERE (ID=:id)');
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+            if($this->db->dbh->commit()){
+                return true;
+            }else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollBack();
+            }
+            error_log($e->getMessage(),0);
         }
-        else{
-            return false;
-        }  
+        // $this->db->query('UPDATE tblmember SET deleted=:del WHERE (ID=:id)');
+        // $this->db->bind(':del',$_SESSION['one']);
+        // $this->db->bind(':id',$data['id']);
+        // if ($this->db->execute()) {
+        //     $act ='Updated Member '.$data['name'];
+        //     $this->createLog($this->db,$act);
+        //     return true;
+        // }
+        // else{
+        //     return false;
+        // }  
     }
     public function update($data)
     {

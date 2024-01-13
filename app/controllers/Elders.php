@@ -95,7 +95,9 @@ class Elders extends Controller
                 exit;
             }
 
-            $data['userid'] = $this->createuserid($data['name']);
+            $data['userid'] = substr($data['contact'],1);
+
+            // $data['userid'] = $this->createuserid($data['name']);
 
             if(!$this->eldermodel->CreateUpdate($data))
             {
