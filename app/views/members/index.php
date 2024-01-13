@@ -134,7 +134,7 @@
           'ordering' : false,
           "responsive": true,
           'columnDefs' : [
-            // { "visible" : false, "targets": 0},
+            { "visible" : false, "targets": 0},
             {"width" : "5%" , "targets": 2},
             {"width" : "10%" , "targets": 3}
             <?php if ($_SESSION['userType'] <=2) : ?>
