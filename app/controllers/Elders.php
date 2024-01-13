@@ -5,6 +5,7 @@ class Elders extends Controller
     private $authmodel;
     private $usermodel;
     private $reusemodel;
+    private $transfermodel;
     public function __construct()
     {
         if(!isset($_SESSION['userId'])){
@@ -15,6 +16,7 @@ class Elders extends Controller
         $this->eldermodel = $this->model('Elder');
         $this->reusemodel = $this->model('Reusables');
         $this->usermodel = $this->model('User');
+        $this->transfermodel = $this->model('Transfer');
         checkrights($this->authmodel,'group fund requisition');
     }
 
@@ -66,7 +68,8 @@ class Elders extends Controller
                 'district' => isset($_POST['district']) && !empty(trim($_POST['district'])) ? (int)trim($_POST['district']) : null,
                 'role' => isset($_POST['role']) && !empty(trim($_POST['role'])) ? (int)trim($_POST['role']) : null,
                 'date' => isset($_POST['date']) && !empty(trim($_POST['date'])) ? date('Y-m-d',strtotime($_POST['date'])) : null,
-                'userid' => '',
+                'memberid' => converttobool($_POST['isedit']) ? trim($_POST['memberid']) : null,
+                'useridprimary' => converttobool($_POST['isedit']) ? trim($_POST['userid']) : null,
                 'errmsg' => [],
             ];
 
@@ -108,7 +111,7 @@ class Elders extends Controller
                 exit;
             }
 
-            flash('elder_msg',"Elder Added Successfully!");
+            flash('elder_msg', !$data['isedit'] ? "Elder Added Successfully!" : 'Elder Edited Successfully!');
             redirect('elders');
 
         }
@@ -120,20 +123,24 @@ class Elders extends Controller
     }
 
     public function edit($id)
-    
     {
+        $details = $this->eldermodel->GetUserDetails($id);
+        $date = $this->eldermodel->GetSetDate($id);
         $data = [
-            'title' => 'Add Elder',
+            'title' => 'Edit Elder',
             'congregations' => $this->reusemodel->GetCongregations(),
+            'districts' => $this->transfermodel->GetDistricts($details->congregationId),
             'roles' => $this->reusemodel->GetRoles(),
-            'id' => '',
-            'isedit' => false,
-            'name' => '',
-            'contact' => '',
-            'congregation' => '',
-            'district' => '',
-            'role' => '',
-            'date' => date('Y-m-d'),
+            'id' => $id,
+            'isedit' => true,
+            'name' => strtoupper($details->ElderName),
+            'contact' => $details->Contact,
+            'congregation' => $details->congregationId,
+            'district' => $details->districtId,
+            'memberid' => $details->MemberId,
+            'userid' => $this->eldermodel->GetUserId($id),
+            'role' => 1,
+            'date' => date('Y-m-d',strtotime($date)),
             'errmsg' => [],
         ];
         $this->view('elders/add',$data);

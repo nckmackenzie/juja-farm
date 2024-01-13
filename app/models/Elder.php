@@ -102,11 +102,100 @@ class Elder
         }
     }
 
+    public function Edit($data)
+    {
+        try {
+            
+            $this->db->dbh->beginTransaction();
+ 
+            $this->db->query('UPDATE tblmember SET memberName=:mname,contact=:contact,districtId=:did,congregationId=:cid
+                              WHERE (ID=:id)');
+           
+            $this->db->bind(':mname',$data['name']);
+            $this->db->bind(':contact',$data['contact']);   
+            $this->db->bind(':did',$data['district']);
+            $this->db->bind(':cid',$data['congregation']);
+            $this->db->bind(':id',$data['memberid']);
+            $this->db->execute();
+
+            $this->db->query('UPDATE tblelders SET ElderName=:ename,Contact=:contact WHERE (ID=:id)');
+            $this->db->bind(':ename',$data['name']);
+            $this->db->bind(':contact',$data['contact']);
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+     
+            $this->db->query('UPDATE tbleldermovement SET ToCongregation=:cong,ToDistrict=:dist,TransferDate=:tdate
+                              WHERE (ElderId=:id AND IsTransfer=0)');
+            $this->db->bind(':cong',$data['congregation']);
+            $this->db->bind(':dist',$data['district']);
+            $this->db->bind(':tdate',$data['date']);
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+
+            $this->db->query('UPDATE tblusers SET UserID=:usid,UserName=:uname,contact=:contact,districtId=:district,CongregationId=:cong
+                              WHERE(ID=:id)');
+            $this->db->bind(':usid',$data['userid']);
+            $this->db->bind(':uname',$data['name']);
+            $this->db->bind(':contact',$data['contact']);
+            $this->db->bind(':district',$data['district']);
+            $this->db->bind(':cong',$data['congregation']);
+            $this->db->bind(':id',$data['useridprimary']);
+            $this->db->execute();
+            
+            if ($this->db->dbh->commit()) {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
+            return false;
+        }
+    }
+
     public function CreateUpdate($data)
     {
-        if(!$data['isedit']){
+        if(!$data['isedit'])
+        {
            return $this->Create($data);
         }
+        else
+        {
+            return $this->Edit($data);
+        }
+    }
+
+    public function GetUserDetails($id)
+    {
+        $sql = 'SELECT 
+                    e.ID,
+                    e.ElderName,
+                    e.Contact,
+                    e.MemberId,
+                    m.districtId,
+                    m.congregationId
+                FROM tblelders e join tblmember m on e.MemberId = m.ID 
+                WHERE e.ID = :id';
+        $this->db->query($sql);
+        $this->db->bind(':id',$id);
+        return $this->db->single();
+    }
+
+    public function GetSetDate($id)
+    {
+        return getdbvalue($this->db->dbh,'SELECT TransferDate FROM tbleldermovement  WHERE (ElderId=?) AND (IsTransfer=0)',[$id]);
+    }
+
+    public function GetUserId($id)
+    {
+        $contact = getdbvalue($this->db->dbh,'SELECT Contact FROM tblelders  WHERE (ID=?)',[$id]);
+        return  getdbvalue($this->db->dbh,'SELECT ID FROM tblusers WHERE (contact=?)',[$contact]);
     }
 
     public function GetElderContactAndId($id)

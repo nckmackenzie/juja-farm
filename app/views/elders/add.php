@@ -59,7 +59,12 @@
                                     <div class="form-group">
                                         <label for="district">District</label>
                                         <select name="district" id="district" class="form-control form-control-sm mandatory">
-                                            <option value="">Select district</option>
+                                            <option value="" disabled>Select district</option>
+                                            <?php if($data['isedit']) : ?>
+                                                <?php foreach($data['districts'] as $district) : ?>
+                                                    <option value="<?php echo $district->ID;?>" <?php selectdCheck($data['district'],$district->ID);?>><?php echo $district->fieldName;?></option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </select>
                                         <span class="invalid-feedback"></span>
                                     </div>
@@ -98,6 +103,10 @@
                             <div class="row">
                                 <div class="col-md-2 mt-2">
                                     <input type="hidden" name="id" value="<?php echo $data['id'];?>">
+                                    <?php if($data['isedit']) : ?>
+                                        <input type="hidden" name="memberid" value="<?php echo $data['memberid'];?>">
+                                        <input type="hidden" name="userid" value="<?php echo $data['userid'];?>">
+                                    <?php endif; ?>
                                     <input type="hidden" name="isedit" value="<?php echo $data['isedit'];?>">
                                     <button type="submit" class="btn btn-block btn-sm bg-navy custom-font">Save</button>
                                 </div>
