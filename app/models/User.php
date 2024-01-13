@@ -369,6 +369,18 @@ class User {
             return false;
         }
 
+        if($rightscount !== 0){
+            $this->db->query('DELETE FROM tbluserrights WHERE UserId = :id');
+            $this->db->bind(':id',(int)$id);
+            $this->db->execute();
+        }
+
+        if($logscount !== 0){
+            $this->db->query('DELETE FROM tbllogs WHERE UserId = :id');
+            $this->db->bind(':id',(int)$id);
+            $this->db->execute();
+        }
+
         $this->db->query("DELETE FROM tblusers WHERE ID = :id");
         $this->db->bind(':id',(int)$id);
         if($this->db->execute()) {
