@@ -29,16 +29,27 @@ class Deacon
         return loadresultset($this->db->dbh,$sql,[$district]);
     }
 
+    public function RoleIsSet($role,$year,$district,$id)
+    {
+        if($role === 'none') return false;
+
+        $exists = getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tbldeacons 
+                                             WHERE (Role=?) AND (YearId=?) AND (DistrictId=?) AND (ID <> ?)',[$role, $year,$district,$id]);
+        if((int)$exists > 0) return true;
+        return false;
+    }
+
     public function CreateUpdate($data)
     {
        if(!$data['isedit'])
        {
-            $this->db->query('INSERT INTO tbldeacons (DeaconId,DistrictId,YearId,Zone,CongregationId) 
-                              VALUES(:deacon,:did,:yid,:zone,:cid)');
+            $this->db->query('INSERT INTO tbldeacons (DeaconId,DistrictId,YearId,Zone,Role,CongregationId) 
+                              VALUES(:deacon,:did,:yid,:zone,:role,:cid)');
             $this->db->bind(':deacon',$data['deacon']);
             $this->db->bind(':did',$data['district']);
             $this->db->bind(':yid',$data['year']);
             $this->db->bind(':zone',$data['zone']);
+            $this->db->bind(':role',$data['role']);
             $this->db->bind(':cid',$_SESSION['congId']);
             if(!$this->db->execute())
             {
@@ -48,12 +59,13 @@ class Deacon
        }
        else
        {
-            $this->db->query('UPDATE tbldeacons SET DeaconId=:deacon,DistrictId=:did,YearId=:yid,Zone=:zone 
+            $this->db->query('UPDATE tbldeacons SET DeaconId=:deacon,DistrictId=:did,YearId=:yid,Zone=:zone,Role=:role 
                               WHERE (ID=:id)');
             $this->db->bind(':deacon',$data['deacon']);
             $this->db->bind(':did',$data['district']);
             $this->db->bind(':yid',$data['year']);
             $this->db->bind(':zone',$data['zone']);
+            $this->db->bind(':role',$data['role']);
             $this->db->bind(':id',$data['id']);
             if(!$this->db->execute())
             {

@@ -37,7 +37,7 @@ class Deacons extends Controller
             'year' => '',
             'district' => '',
             'zone' => '',
-            'role' => '',
+            'role' => 'none',
             'errors' => []
         ];
         $this->view('deacons/add',$data);
@@ -72,7 +72,7 @@ class Deacons extends Controller
                 'year' => isset($_POST['year']) && !empty(trim($_POST['year'])) ? (int)trim($_POST['year']) : null,
                 'district' => isset($_POST['district']) && !empty(trim($_POST['district'])) ? (int)trim($_POST['district']) : null,
                 'zone' => isset($_POST['zone']) && !empty(trim($_POST['zone'])) ? trim(strtolower($_POST['zone'])) : null,
-                'role' => '',
+                'role' => isset($_POST['role']) && !empty(trim($_POST['role'])) ? trim(strtolower($_POST['role'])) : "none",
                 'errors' => []
             ];
 
@@ -89,6 +89,11 @@ class Deacons extends Controller
             if(!is_null($data['district']))
             {
                 $data['members'] = $this->deaconmodel->GetMembersByDistrict($data['district']);
+            }
+
+            if($this->deaconmodel->RoleIsSet($data['role'],$data['year'],$data['district'],$data['id']))
+            {
+                array_push($data['errors'],'Role already defined for selected district for selected year!');
             }
 
             if(count($data['errors']) > 0)
@@ -124,7 +129,7 @@ class Deacons extends Controller
             'year' => $deacon->YearId,
             'district' => $deacon->DistrictId,
             'zone' => ucwords($deacon->Zone),
-            'role' => '',
+            'role' => $deacon->Role,
             'errors' => []
         ];
         $this->view('deacons/add',$data);
