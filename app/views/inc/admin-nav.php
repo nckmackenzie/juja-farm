@@ -67,6 +67,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?php echo URLROOT;?>/deacons" class="nav-link">
+                        <p>Deacons</p>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?php echo URLROOT;?>/services" class="nav-link">
                         <p>Services</p>
                     </a>
