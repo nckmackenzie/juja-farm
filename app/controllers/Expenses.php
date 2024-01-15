@@ -1,5 +1,8 @@
 <?php
 class Expenses extends Controller{
+    private $authmodel;
+    private $expenseModel;
+    private $reusemodel;
     public function __construct()
     {
         if (!isset($_SESSION['userId'])) {
@@ -20,7 +23,7 @@ class Expenses extends Controller{
 
     public function add()
     {
-        $accounts = $this->reusemodel->GetAccounts(2);
+        $accounts = $this->reusemodel->GetExpenseAndAssetsAccounts();
         $paymethods = $this->reusemodel->PaymentMethods();
         $banks = $this->reusemodel->GetBanks();
         $voucherno = $this->expenseModel->VoucherNo();
