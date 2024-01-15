@@ -11,7 +11,7 @@
         </button>
       </div>
       <div class="modal-body">
-          <form action="<?php echo URLROOT;?>/deposits/delete" method="post">
+          <form action="<?php echo URLROOT;?>/deacons/delete" method="post">
               <div class="row">
                 <div class="col-md-9">
                   <label for="">Are You Sure You Want To Delete Selected deacon?</label>
