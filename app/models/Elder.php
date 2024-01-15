@@ -40,12 +40,13 @@ class Elder
             $memberid = getLastId($this->db->dbh,'tblmember');
             $mno = $this->genMemberNo($data['congregation']);
 
-            $this->db->query('INSERT INTO tblmember (ID,memberId,memberName,contact,districtId,positionId,congregationId)
-                              VALUES(:id,:mid,:mname,:contact,:did,:pid,:cid)');
+            $this->db->query('INSERT INTO tblmember (ID,memberId,memberName,contact,memberStatus,districtId,positionId,congregationId)
+                              VALUES(:id,:mid,:mname,:contact,:mstatus,:did,:pid,:cid)');
             $this->db->bind(':id',$memberid);
             $this->db->bind(':mid',$mno);     
             $this->db->bind(':mname',$data['name']);
             $this->db->bind(':contact',$data['contact']);   
+            $this->db->bind(':mstatus',1);   
             $this->db->bind(':did',$data['district']);
             $this->db->bind(':pid',2);
             $this->db->bind(':cid',$data['congregation']);
