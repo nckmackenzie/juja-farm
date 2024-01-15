@@ -83,6 +83,25 @@
                                 </div>
                             </div>
                             <div class="row">
+                                <div class="form-group">
+                                    <label for="zone">Role</label>
+                                    <div class="col-sm-6 d-flex align-items-center" style="gap: 2rem;">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="role" value="none"  <?php echo $data['role'] === 'none' ? 'checked' : '';?>>
+                                            <label class="form-check-label">None</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="role" value="treasurer" <?php echo $data['role'] === 'treasurer' ? 'checked' : '';?>>
+                                            <label class="form-check-label">Treasurer</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="role" value="secretary" <?php echo $data['role'] === 'secretary' ? 'checked' : '';?>>
+                                            <label class="form-check-label">Secretary</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-2 mt-2">
                                     <input type="hidden" name="id" value="<?php echo $data['id'];?>">
                                     <input type="hidden" name="isedit" value="<?php echo $data['isedit'];?>">
