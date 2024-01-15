@@ -22,6 +22,13 @@ class Reusables
         return $this->db->resultSet();                  
     }
 
+    public function GetExpenseAndAssetsAccounts()
+    {
+        $this->db->query('SELECT ID,UCASE(accountType) AS accountType FROM tblaccounttypes 
+                          WHERE ((accountTypeId = 2) OR (accountTypeId = 3)) AND (deleted=0) AND (isBank = 0) AND (parentId <> 0) ORDER BY accountType');
+        return $this->db->resultSet();                  
+    }
+
     public function GetAccountsAll()
     {
         $this->db->query('SELECT ID,UCASE(accountType) AS accountType FROM tblaccounttypes 
