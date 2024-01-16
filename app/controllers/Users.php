@@ -1,5 +1,7 @@
 <?php
 class Users extends Controller{
+    private $userModel;
+    private $reusemodel;
     public function __construct()
     {
         // if (!isset($_SESSION['userId']) || $_SESSION['userType'] > 2) {
@@ -7,6 +9,7 @@ class Users extends Controller{
         // }
         // else{
             $this->userModel = $this->model('User');
+            $this->reusemodel = $this->model('Reusables');
         // }
     }
     public function index()
@@ -35,12 +38,14 @@ class Users extends Controller{
             $districts = $this->userModel->getDistricts();
             $data = [
                 'districts' => $districts,
+                'roles' => $this->reusemodel->GetRoles(),
                 'userid' => '',
                 'username' => '',
                 'usertype' => '',
                 'active' => '',
                 'contact' => '',
                 'district' => '',
+                'role' => '',
                 'userid_err' =>'',
                 'username_err' =>'',
                 'usertype_err' =>'',
@@ -58,11 +63,13 @@ class Users extends Controller{
             $districts = $this->userModel->getDistricts();
             $data = [
                 'districts' => $districts,
+                'roles' => $this->reusemodel->GetRoles(),
                 'userid' => trim(strtolower($_POST['userid'])),
                 'username' => trim(strtolower($_POST['username'])),
                 'usertype' => $_POST['usertype'],
                 'active' => $_POST['active'],
                 'contact' => $_POST['contact'],
+                'role' => $_POST['role'],
                 'district' => !empty($_POST['district']) ? $_POST['district'] : NULL,
                 'userid_err' =>'',
                 'username_err' =>'',
@@ -353,8 +360,9 @@ class Users extends Controller{
                 $random = substr(md5(mt_rand()),0,7);
                 $hashed =  password_hash($random,PASSWORD_DEFAULT);
                 $data['password'] = $hashed;
+                $userid = $this->userModel->GetUserByContact($data['phone']);
                 if ($this->userModel->resendCredentials($data)) {
-                    $message = 'Password Reset Successful! Your New Password Is '.$random .' click on the provided link to log in. ' . URLROOT;
+                    $message = 'Password Reset Successful! Your New Password Is '.$random .' Your UserID is '.$userid.' click on the provided link to log in. ' . URLROOT . '/users';
                     $countryPrexix ='+254';
                     $sb = substr($data['phone'],1);
                     $full = $countryPrexix . $sb;
@@ -380,12 +388,14 @@ class Users extends Controller{
         $data = [
             'districts' => $districts,
             'user' => $user,
+            'roles' => $this->reusemodel->GetRoles(),
             'id' => '',
             'username' => '',
             'usertype' => '',
             'active' => '',
             'contact' => '',
             'district' => '',
+            'role' => $user->roleId,
             'userid_err' =>'',
             'username_err' =>'',
             'usertype_err' =>'',
@@ -402,14 +412,16 @@ class Users extends Controller{
             
             $districts = $this->userModel->getDistricts();
             $data = [
-                'user => '
-,               'id' => trim($_POST['id']),
+                'user' => '',
+                'id' => trim($_POST['id']),
                 'districts' => $districts,
+                'roles' => $this->reusemodel->GetRoles(),
                 'userid' => $_POST['userid'],
                 'username' => trim(strtolower($_POST['username'])),
                 'usertype' => $_POST['usertype'],
                 'active' => $_POST['active'],
                 'contact' => $_POST['contact'],
+                'role' => $_POST['role'],
                 'district' => !empty($_POST['district']) ? $_POST['district'] : NULL,
                 'userid_err' =>'',
                 'username_err' =>'',
@@ -476,8 +488,9 @@ class Users extends Controller{
                 $random = substr(md5(mt_rand()),0,7);
                 $hashed =  password_hash($random,PASSWORD_DEFAULT);
                 $data['password'] = $hashed;
+                $userid = $this->userModel->GetUserByContact($data['phone']);
                 if ($this->userModel->resetCredentials($data)) {
-                    $message = 'Password Reset Successful! Your New Password Is '.$random .'click on the provided link to log in. ' . URLROOT;
+                    $message = 'Password Reset Successful! Your New Password Is '.$random .'  and your UserID is '.$userid.' click on the provided link to log in. ' . URLROOT .'/users';
                     $countryPrexix ='+254';
                     $sb = substr($data['phone'],1);
                     $full = $countryPrexix . $sb;

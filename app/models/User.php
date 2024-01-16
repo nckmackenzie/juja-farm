@@ -227,19 +227,59 @@ class User {
         $this->db->bind(':id',decryptId($id));
         return $this->db->single();
     }
+    public function GetUserByContact($contact)
+    {
+        return getdbvalue($this->db->dbh,'SELECT UserID FROM tbusers WHERE (contact=?)',[$contact]);
+    }
+    function RightsSet($role)
+    {
+        return getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tblrolerights WHERE RoleId=?',[(int)$role]);
+    }
     public function update($data)
     {
        
-        $this->db->query('UPDATE tblusers SET UserID=:userid,UserName=:uname,UsertypeId=:utype,Active=:act,
-                                 contact=:contact,districtId=:district
+        try {
+            $this->db->dbh->beginTransaction();
+            $this->db->query('UPDATE tblusers SET UserID=:userid,UserName=:uname,UsertypeId=:utype,Active=:act,
+                                 contact=:contact,districtId=:district,roleId=:roleid
                           WHERE  (ID=:id)');
-        $this->db->bind(':userid',$data['userid']);                   
-        $this->db->bind(':uname',$data['username']);
-        $this->db->bind(':utype',$data['usertype']);
-        $this->db->bind(':act',$data['active']);
-        $this->db->bind(':contact',$data['contact']);
-        $this->db->bind(':district',$data['district']);
-        $this->db->bind(':id',$data['id']);
+            $this->db->bind(':userid',$data['userid']);                   
+            $this->db->bind(':uname',$data['username']);
+            $this->db->bind(':utype',$data['usertype']);
+            $this->db->bind(':act',$data['active']);
+            $this->db->bind(':contact',$data['contact']);
+            $this->db->bind(':district',$data['district']);
+            $this->db->bind(':roleid', !empty(trim($data['role'])) ? $data['role'] : null);
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+            $this->db->query('DELETE FROM tbluserrights WHERE (UserId=:usid)');
+            $this->db->bind(':usid',$data['id']);
+            $this->db->execute();
+
+            if($this->RightsSet($data['role']) > 0){
+                $this->db->query('CALL sp_role_pairing(:user1,:role)');
+                $this->db->bind(':user1',$data['id']);
+                $this->db->bind(':role',$data['role']);
+                $this->db->execute();
+            }
+
+            if ($this->db->dbh->commit()) {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
+            return false;
+        }
+
+        
         //execute
         if ($this->db->execute()) {
             return true;
