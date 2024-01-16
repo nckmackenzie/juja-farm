@@ -58,7 +58,7 @@
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                    <span class="invalid-feedback"><?php echo $data['district_err'];?></span>
+                                   
                                 </div>
                             </div>
                         </div><!--End Of Row -->
