@@ -43,6 +43,11 @@ class Group {
         }
     }
 
+    function RightsSet($role)
+    {
+        return getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tblrolerights WHERE RoleId=?',[(int)$role]);
+    }
+
     public function useridexists($userid)
     {
         $count = getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tblusers 
@@ -81,6 +86,14 @@ class Group {
             $this->db->bind(':group',$id);
             $this->db->bind(':cong',$_SESSION['congId']);
             $this->db->execute();
+            $chairid = $this->db->dbh->lastInsertId();
+
+            if($this->RightsSet(2) > 0){
+                $this->db->query('CALL sp_role_pairing(:user1,:role)');
+                $this->db->bind(':user1',$chairid);
+                $this->db->bind(':role',2);
+                $this->db->execute();
+            }
 
             $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
             $this->db->bind(':usid',$data['treasureruserid']);
@@ -91,6 +104,14 @@ class Group {
             $this->db->bind(':group',$id);
             $this->db->bind(':cong',$_SESSION['congId']);
             $this->db->execute();
+            // $treasurerid = $this->db->dbh->lastInsertId();
+
+            // if($this->RightsSet(2) > 0){
+            //     $this->db->query('CALL sp_role_pairing(:user1,:role)');
+            //     $this->db->bind(':user1',$treasurerid);
+            //     $this->db->bind(':role',2);
+            //     $this->db->execute();
+            // }
 
             $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
             $this->db->bind(':usid',$data['secretaryuserid']);
@@ -101,6 +122,14 @@ class Group {
             $this->db->bind(':group',$id);
             $this->db->bind(':cong',$_SESSION['congId']);
             $this->db->execute();
+            $secretaryid = $this->db->dbh->lastInsertId();
+
+            if($this->RightsSet(3) > 0){
+                $this->db->query('CALL sp_role_pairing(:user1,:role)');
+                $this->db->bind(':user1',$secretaryid);
+                $this->db->bind(':role',3);
+                $this->db->execute();
+            }
 
             if ($this->db->dbh->commit()) {
                 return true;
@@ -151,6 +180,14 @@ class Group {
                 $this->db->bind(':group',$data['id']);
                 $this->db->bind(':cong',$_SESSION['congId']);
                 $this->db->execute();
+                $chairid = $this->db->dbh->lastInsertId();
+
+                if($this->RightsSet(2) > 0){
+                    $this->db->query('CALL sp_role_pairing(:user1,:role)');
+                    $this->db->bind(':user1',$chairid);
+                    $this->db->bind(':role',2);
+                    $this->db->execute();
+                }
 
                 $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
                 $this->db->bind(':usid',$data['treasureruserid']);
@@ -171,6 +208,14 @@ class Group {
                 $this->db->bind(':group',$data['id']);
                 $this->db->bind(':cong',$_SESSION['congId']);
                 $this->db->execute();
+                $secretaryid = $this->db->dbh->lastInsertId();
+
+                if($this->RightsSet(3) > 0){
+                    $this->db->query('CALL sp_role_pairing(:user1,:role)');
+                    $this->db->bind(':user1',$secretaryid);
+                    $this->db->bind(':role',3);
+                    $this->db->execute();
+                }
             }else{
                 $users = loadresultset($this->db->dbh,'SELECT ID FROM tblusers WHERE (GroupId=?)',[$data['id']]);
                 $this->db->query('UPDATE tblusers SET UserID=:usid WHERE(ID=:id)');
