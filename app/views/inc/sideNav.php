@@ -3,7 +3,7 @@
 
     $con = new Database;
     if((int)$_SESSION['userType'] > 2 && (int)$_SESSION['userType'] !== 6){
-        $menuitems = getusermenuitems($con->dbh,(int)$_SESSION['userId'],!converttobool($_SESSION['isParish']));
+        $menuitems = getusermenuitems($con->dbh,(int)$_SESSION['userId'],$_SESSION['isParish']);
     }
     $menuicons = [
         'master entry' => 'fa-cogs',
