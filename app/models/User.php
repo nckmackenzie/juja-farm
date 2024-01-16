@@ -391,6 +391,10 @@ class User {
     }
     public function clonerights($data)
     {
+        $this->db->query('DELETE FROM tbluserrights WHERE (UserId=:id)');
+        $this->db->bind(':user2',$data['user2']);
+        $this->db->execute();
+
         $this->db->query('CALL sp_menu_pairing(:user1,:user2)');
         $this->db->bind(':user1',$data['user1']);
         $this->db->bind(':user2',$data['user2']);
