@@ -28,12 +28,13 @@ class Group {
         $this->db->bind(':cid',$_SESSION['congId']);
         return $this->db->resultSet();
     }
-    public function checkExists($name)
+    public function checkExists($name,$id)
     {
         $this->db->query('SELECT ID FROM tblgroups WHERE (groupName=:ame)
-                          AND (congregationId=:cid)');
+                          AND (congregationId=:cid) AND (ID <> :id)');
         $this->db->bind(':ame',$name);
         $this->db->bind(':cid',$_SESSION['congId']);
+        $this->db->bind(':id',$id);
         $this->db->execute();
         if ($this->db->rowCount() > 0) {
            return false;
@@ -41,18 +42,79 @@ class Group {
             return true;
         }
     }
-    public function create($data)
+
+    public function useridexists($userid)
     {
-        $this->db->query('INSERT INTO tblgroups (groupName,active,congregationId) VALUES(:did,:act,:cid)');
-        $this->db->bind(':did',$data['name']);
-        $this->db->bind(':act',$data['active']);
-        $this->db->bind(':cid',$_SESSION['congId']);
-        if ($this->db->execute()) {
-            $activity = 'Added Group '.$data['name'];
-            $this->createLog($this->db,$activity);
-            return true;
-        }
-        else{
+        $count = getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tblusers 
+                                            WHERE (UserID=?) AND (CongregationId=?)',[$userid,$_SESSION['congId']]);
+        if((int)$count > 0) return true;
+        return false;
+    }
+
+    function userscreated($groupid)
+    {
+        return getdbvalue($this->db->dbh,'SELECT COUNT(*) FROM tblusers WHERE GroupId=?',[$groupid]);
+    }
+    
+    function create($data)
+    {
+        try {
+            
+            $this->db->dbh->beginTransaction();
+            $this->db->query('INSERT INTO tblgroups (groupName,active,chairuserid,treasureruserid,secretaryuserid,congregationId) 
+                              VALUES(:did,:act,:chair,:treas,:sec,:cid)');
+            $this->db->bind(':did',$data['name']);
+            $this->db->bind(':act',$data['active']);
+            $this->db->bind(':chair',$data['chairuserid']);
+            $this->db->bind(':treas',$data['treasureruserid']);
+            $this->db->bind(':sec',$data['secretaryuserid']);
+            $this->db->bind(':cid',$_SESSION['congId']);
+            $this->db->execute();
+            $id = $this->db->dbh->lastInsertId();
+
+            $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
+            $this->db->bind(':usid',$data['chairuserid']);
+            $this->db->bind(':uname',$data['name'] . 'chairman');
+            $this->db->bind(':utype',3);
+            $this->db->bind(':pass', password_hash('123456',PASSWORD_DEFAULT) );
+            $this->db->bind(':act',1);
+            $this->db->bind(':group',$id);
+            $this->db->bind(':cong',$_SESSION['congId']);
+            $this->db->execute();
+
+            $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
+            $this->db->bind(':usid',$data['treasureruserid']);
+            $this->db->bind(':uname',$data['name'] . 'treasurer');
+            $this->db->bind(':utype',3);
+            $this->db->bind(':pass', password_hash('123456',PASSWORD_DEFAULT) );
+            $this->db->bind(':act',1);
+            $this->db->bind(':group',$id);
+            $this->db->bind(':cong',$_SESSION['congId']);
+            $this->db->execute();
+
+            $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
+            $this->db->bind(':usid',$data['secretaryuserid']);
+            $this->db->bind(':uname',$data['name'] . 'secretary');
+            $this->db->bind(':utype',3);
+            $this->db->bind(':pass', password_hash('123456',PASSWORD_DEFAULT) );
+            $this->db->bind(':act',1);
+            $this->db->bind(':group',$id);
+            $this->db->bind(':cong',$_SESSION['congId']);
+            $this->db->execute();
+
+            if ($this->db->dbh->commit()) {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
             return false;
         }
     }
@@ -62,32 +124,124 @@ class Group {
         $this->db->bind(':id',$id);
         return $this->db->single();
     }
-    public function update($data)
+
+    function update($data)
     {
-        $this->db->query('UPDATE tblgroups SET groupName=:group,active=:act WHERE (ID=:id)');
-        $this->db->bind(':group',$data['name']);
-        $this->db->bind(':act',$data['active']);
-        $this->db->bind(':id',$data['id']);
-        if ($this->db->execute()) {
-            $activity = 'Edited Group '.$data['name'];
-            $this->createLog($this->db,$activity);
-            return true;
-        }
-        else{
+        try {
+            
+            $this->db->dbh->beginTransaction();
+            $this->db->query('UPDATE tblgroups SET groupName=:gname,active=:act,chairuserid=:chair,treasureruserid=:treas,
+                                                   secretaryuserid=:sec 
+                              WHERE (ID=:id)');
+            $this->db->bind(':gname',$data['name']);
+            $this->db->bind(':act',$data['active']);
+            $this->db->bind(':chair',$data['chairuserid']);
+            $this->db->bind(':treas',$data['treasureruserid']);
+            $this->db->bind(':sec',$data['secretaryuserid']);
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+          
+            if((int)$this->userscreated($data['id']) === 0){
+                $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
+                $this->db->bind(':usid',$data['chairuserid']);
+                $this->db->bind(':uname',$data['name'] . 'chairman');
+                $this->db->bind(':utype',3);
+                $this->db->bind(':pass', password_hash('123456',PASSWORD_DEFAULT) );
+                $this->db->bind(':act',1);
+                $this->db->bind(':group',$data['id']);
+                $this->db->bind(':cong',$_SESSION['congId']);
+                $this->db->execute();
+
+                $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
+                $this->db->bind(':usid',$data['treasureruserid']);
+                $this->db->bind(':uname',$data['name'] . 'treasurer');
+                $this->db->bind(':utype',3);
+                $this->db->bind(':pass', password_hash('123456',PASSWORD_DEFAULT) );
+                $this->db->bind(':act',1);
+                $this->db->bind(':group',$data['id']);
+                $this->db->bind(':cong',$_SESSION['congId']);
+                $this->db->execute();
+
+                $this->db->query('INSERT INTO tblusers (UserID,UserName,UsertypeId,`Password`,Active,GroupId,CongregationId) VALUES(:usid,:uname,:utype,:pass,:act,:group,:cong)');
+                $this->db->bind(':usid',$data['secretaryuserid']);
+                $this->db->bind(':uname',$data['name'] . 'secretary');
+                $this->db->bind(':utype',3);
+                $this->db->bind(':pass', password_hash('123456',PASSWORD_DEFAULT) );
+                $this->db->bind(':act',1);
+                $this->db->bind(':group',$data['id']);
+                $this->db->bind(':cong',$_SESSION['congId']);
+                $this->db->execute();
+            }else{
+                $users = loadresultset($this->db->dbh,'SELECT ID FROM tblusers WHERE (GroupId=?)',[$data['id']]);
+                $this->db->query('UPDATE tblusers SET UserID=:usid WHERE(ID=:id)');
+                $this->db->bind(':usid',$data['chairuserid']);
+                $this->db->bind(':id',$users[0]->ID);
+                $this->db->execute();
+
+                $this->db->query('UPDATE tblusers SET UserID=:usid WHERE(ID=:id)');
+                $this->db->bind(':usid',$data['treasureruserid']);
+                $this->db->bind(':id',$users[1]->ID);
+                $this->db->execute();
+
+                $this->db->query('UPDATE tblusers SET UserID=:usid WHERE(ID=:id)');
+                $this->db->bind(':usid',$data['secretaryuserid']);
+                $this->db->bind(':id',$users[0]->ID);
+                $this->db->execute();
+            }
+            
+
+            if ($this->db->dbh->commit()) {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
             return false;
+        }   
+    }
+
+    public function createupdate($data)
+    {
+        if(!$data['isedit']){
+            return $this->create($data);
         }
+        return $this->update($data);
     }
     public function delete($data)
     {
-        $this->db->query('UPDATE tblgroups SET deleted=:del WHERE (ID=:id)');
-        $this->db->bind(':del',$_SESSION['one']);
-        $this->db->bind(':id',$data['id']);
-        if ($this->db->execute()) {
-            $activity = 'Deleted Group '.$data['name'];
-            $this->createLog($this->db,$activity);
-            return true;
-        }
-        else{
+        try {
+           
+            $this->db->dbh->beginTransaction();
+
+            $this->db->query('UPDATE tblgroups SET deleted=:del WHERE (ID=:id)');
+            $this->db->bind(':del',$_SESSION['one']);
+            $this->db->bind(':id',$data['id']);
+            $this->db->execute();
+
+            $this->db->query('DELETE FROM tblusers WHERE (GroupId=:gid)');
+            $this->db->bind(':gid',$data['id']);
+            $this->db->execute();
+
+            if ($this->db->dbh->commit())
+            {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
             return false;
         }
     }
