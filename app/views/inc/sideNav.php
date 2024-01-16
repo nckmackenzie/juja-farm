@@ -3,7 +3,7 @@
 
     $con = new Database;
     if((int)$_SESSION['userType'] > 2 && (int)$_SESSION['userType'] !== 6){
-        $menuitems = getusermenuitems($con->dbh,(int)$_SESSION['userId'],$_SESSION['isParish']);
+        $menuitems = getusermenuitems($con->dbh,(int)$_SESSION['userId']);
     }
     $menuicons = [
         'master entry' => 'fa-cogs',
@@ -34,7 +34,7 @@
                             </p>
                         </a>
                         <ul class="nav nav-treeview custom-font">
-                            <?php $navitems = getmodulemenuitems($con->dbh,(int)$_SESSION['userId'],$menuitem,$_SESSION['isParish']) ;?>
+                            <?php $navitems = getmodulemenuitems($con->dbh,(int)$_SESSION['userId'],$menuitem) ;?>
                             <?php foreach($navitems as $navitem) : ?>
                                 <li class="nav-item">
                                     <a href="<?php echo URLROOT;?>/<?php echo $navitem->Path;?>" class="nav-link">

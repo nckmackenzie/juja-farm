@@ -406,16 +406,16 @@ function validateemail($email){
 }
 
 //get submenus
-function getusermenuitems($con,$userid,$iscong)
+function getusermenuitems($con,$userid)
 {
     $sql = 'SELECT 
                 DISTINCT f.Module 
             FROM 
                 tbluserrights r INNER JOIN tblforms f on r.FormId = f.ID 
-            WHERE (r.UserId = ?) AND (f.CongregationNav = ?)
+            WHERE (r.UserId = ?)
             ORDER BY f.ModuleId';
     $stmt = $con->prepare($sql);
-    $stmt->execute([$userid,$iscong]);
+    $stmt->execute([$userid]);
     $results = $stmt->fetchAll(PDO::FETCH_OBJ);
     $modules = array();
     foreach($results as $result) {
@@ -425,17 +425,17 @@ function getusermenuitems($con,$userid,$iscong)
 }
 
 //get menu items
-function getmodulemenuitems($con,$userid,$module,$iscong)
+function getmodulemenuitems($con,$userid,$module)
 {
     $sql = 'SELECT f.FormName,
                    f.Path
             FROM   tbluserrights r inner join tblforms f on r.FormId = f.ID
-            WHERE  r.UserId = :usid AND (f.Module = :menu) AND (f.CongregationNav = :iscong)
+            WHERE  r.UserId = :usid AND (f.Module = :menu)
             ORDER BY f.MenuOrder';
     $stmt = $con->prepare($sql);
     $stmt->bindValue(':usid',$userid);
     $stmt->bindValue(':menu',$module);
-    $stmt->bindValue(':iscong',$iscong);
+    // $stmt->bindValue(':iscong',$iscong);
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_OBJ);
 }
