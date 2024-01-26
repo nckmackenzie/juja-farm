@@ -229,7 +229,7 @@ class User {
     }
     public function GetUserByContact($contact)
     {
-        return getdbvalue($this->db->dbh,'SELECT UserID FROM tbusers WHERE (contact=?)',[$contact]);
+        return getdbvalue($this->db->dbh,'SELECT UserID FROM tblusers WHERE (contact=?)',[$contact]);
     }
     function RightsSet($role)
     {
