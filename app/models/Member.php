@@ -128,7 +128,10 @@ class Member {
         }
         return $id;
     }
-    public function create($data)
+
+    
+
+    function create($data)
     {
        $id = $this->getId();
        $mno =$this->genMemberNo();
@@ -181,6 +184,59 @@ class Member {
             return false;
         }        
     }
+
+    function update($data)
+    {
+       $this->db->query('UPDATE tblmember SET memberName=:mname,idNo=:idno,dob=:dob,genderId=:gender
+                        ,contact=:contact,maritalStatusId=:marital,marriageType=:mtype,marriageDate=:mdate
+                        ,registrationDate=:regdate,memberStatus=:mstatus,passedOn=:pass,baptised=:bap,
+                        baptisedDate=:bdate,membershipStatus=:ship,confirmed=:conf,confirmedDate=:cdate
+                        ,commissioned=:comm,commissionedDate=:comdate,districtId=:did,positionId=:pid,
+                        occupation=:occ,other=:other,email=:email,residence=:res WHERE (ID=:id)');
+        $this->db->bind(':mname',$data['name']);                 
+        $this->db->bind(':idno',$data['idno']);                 
+        $this->db->bind(':dob',$data['dob']);                 
+        $this->db->bind(':gender',$data['gender']);                 
+        $this->db->bind(':contact',$data['contact']);                 
+        $this->db->bind(':marital',$data['maritalstatus']);                 
+        $this->db->bind(':mtype',$data['marriagetype']);                 
+        $this->db->bind(':mdate',$data['marriagedate']);                 
+        $this->db->bind(':regdate',$data['regdate']);                 
+        $this->db->bind(':mstatus',$data['status']);                 
+        $this->db->bind(':pass',$data['passeddate']);                 
+        $this->db->bind(':bap',$data['baptised']);                 
+        $this->db->bind(':bdate',$data['bapitiseddate']);                 
+        $this->db->bind(':ship',$data['membershipstatus']);                 
+        $this->db->bind(':conf',$data['confirmed']);                 
+        $this->db->bind(':cdate',$data['confirmeddate']);                 
+        $this->db->bind(':comm',$data['commissioned']);                 
+        $this->db->bind(':comdate',$data['commissioneddate']);                 
+        $this->db->bind(':did',$data['district']);                 
+        $this->db->bind(':pid',$data['position']);                 
+        $this->db->bind(':occ',$data['occupation']);                 
+        $this->db->bind(':other',$data['occupationother']);                 
+        $this->db->bind(':email',$data['email']);                 
+        $this->db->bind(':res',$data['residence']);                 
+        $this->db->bind(':id',$data['id']);
+        if ($this->db->execute()) {
+            $act ='Updated Member '.$data['name'];
+            $this->createLog($this->db,$act);
+            return true;
+        }         
+        else{
+            return false;
+        }        
+    }
+
+    public function CreateUpdate($data)
+    {
+        if($data['isedit']){
+            return $this->update($data);
+        }else{
+            return $this->create($data);
+        }
+    }
+
     public function delete($data)
     {
         try {
@@ -226,48 +282,7 @@ class Member {
         //     return false;
         // }  
     }
-    public function update($data)
-    {
-       $this->db->query('UPDATE tblmember SET memberName=:mname,idNo=:idno,dob=:dob,genderId=:gender
-                        ,contact=:contact,maritalStatusId=:marital,marriageType=:mtype,marriageDate=:mdate
-                        ,registrationDate=:regdate,memberStatus=:mstatus,passedOn=:pass,baptised=:bap,
-                        baptisedDate=:bdate,membershipStatus=:ship,confirmed=:conf,confirmedDate=:cdate
-                        ,commissioned=:comm,commissionedDate=:comdate,districtId=:did,positionId=:pid,
-                        occupation=:occ,other=:other,email=:email,residence=:res WHERE (ID=:id)');
-        $this->db->bind(':mname',$data['name']);                 
-        $this->db->bind(':idno',$data['idno']);                 
-        $this->db->bind(':dob',$data['dob']);                 
-        $this->db->bind(':gender',$data['gender']);                 
-        $this->db->bind(':contact',$data['contact']);                 
-        $this->db->bind(':marital',$data['maritalstatus']);                 
-        $this->db->bind(':mtype',$data['marriagetype']);                 
-        $this->db->bind(':mdate',$data['marriagedate']);                 
-        $this->db->bind(':regdate',$data['regdate']);                 
-        $this->db->bind(':mstatus',$data['status']);                 
-        $this->db->bind(':pass',$data['passeddate']);                 
-        $this->db->bind(':bap',$data['baptised']);                 
-        $this->db->bind(':bdate',$data['bapitiseddate']);                 
-        $this->db->bind(':ship',$data['membershipstatus']);                 
-        $this->db->bind(':conf',$data['confirmed']);                 
-        $this->db->bind(':cdate',$data['confirmeddate']);                 
-        $this->db->bind(':comm',$data['commissioned']);                 
-        $this->db->bind(':comdate',$data['commissioneddate']);                 
-        $this->db->bind(':did',$data['district']);                 
-        $this->db->bind(':pid',$data['position']);                 
-        $this->db->bind(':occ',$data['occupation']);                 
-        $this->db->bind(':other',$data['occupationother']);                 
-        $this->db->bind(':email',$data['email']);                 
-        $this->db->bind(':res',$data['residence']);                 
-        $this->db->bind(':id',$data['id']);
-        if ($this->db->execute()) {
-            $act ='Updated Member '.$data['name'];
-            $this->createLog($this->db,$act);
-            return true;
-        }         
-        else{
-            return false;
-        }        
-    }
+    
     public function getMemberDistrict($data)
     {
         $this->db->query('SELECT d.ID,UCASE(districtName) as districtName
