@@ -123,7 +123,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?php echo URLROOT;?>/group-membership" class="nav-link">
+                <a href="<?php echo URLROOT;?>/groups/membership" class="nav-link">
                     <p>Group Membership</p>
                 </a>
             </li>
