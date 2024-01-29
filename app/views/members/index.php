@@ -107,15 +107,15 @@
                                     <td><?php echo $member->gender;?></td> 
                                     <td><?php echo $member->district;?></td> 
                                     <td><?php echo $member->position;?></td>
-                                    <?php if ($_SESSION['userType'] <=2 ) : ?>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button class="btn btn-sm bg-gray-dark custom-font resend">Resend Update Link</button>
-                                                <a href="<?php echo URLROOT;?>/members/edit/<?php echo $member->ID;?>" class="btn bg-olive custom-font btn-sm">Edit</a>
+                                    <td>
+                                      <div class="btn-group">
+                                        <button class="btn btn-sm bg-gray-dark custom-font resend">Resend Update Link</button>
+                                        <a href="<?php echo URLROOT;?>/members/edit/<?php echo $member->ID;?>" class="btn bg-olive custom-font btn-sm">Edit</a>
+                                        <?php if ($_SESSION['userType'] <=2 ) : ?>
                                                 <button class="btn btn-danger custom-font btn-sm btndel">Delete</button>
-                                            </div>
-                                        </td>
-                                    <?php endif; ?> 
+                                        <?php endif; ?> 
+                                      </div>
+                                    </td>
                                 </tr>   
                             <?php endforeach; ?>
                           
@@ -140,9 +140,9 @@
             { "visible" : false, "targets": 0},
             {"width" : "5%" , "targets": 2},
             {"width" : "10%" , "targets": 3}
-            <?php if ($_SESSION['userType'] <=2) : ?>
+         
             ,{"width" : "25%" , "targets": 6},
-            <?php endif;?>
+
           ],
           "initComplete": function () {
           this.api().columns([4]).every(function () {
