@@ -445,3 +445,8 @@ function alerterrorclass()
 {
     return 'alert custom-danger alert-dismissible fade show';
 }
+
+function date_is_valid($dateString, $format = 'Y-m-d') {
+    $dateTime = DateTime::createFromFormat($format, $dateString);
+    return $dateTime && $dateTime->format($format) === $dateString;
+}
