@@ -129,6 +129,9 @@
 <?php require APPROOT . '/views/inc/footer.php'?>
 <script>
     $(function(){
+      var urlParams = new URLSearchParams(window.location.search);
+      var isRedirect = !!urlParams.get('redirect') || false;  
+    
       var table = $('#membersTable').DataTable({
           'pageLength' : 25,
           'ordering' : false,
@@ -158,6 +161,14 @@
             });
           });
         }
+      });
+
+      if(isRedirect){
+        table.page(parseInt(localStorage.getItem('membersPage'))).draw( 'page' );
+      }
+
+      $(document).on('click', '#membersTable_next', function () {
+        localStorage.setItem('membersPage',table.page.info().page)
       });
 
       $('#membersTable').on('click','.btndel',function(){
