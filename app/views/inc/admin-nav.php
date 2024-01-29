@@ -123,6 +123,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="<?php echo URLROOT;?>/group-membership" class="nav-link">
+                    <p>Group Membership</p>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="<?php echo URLROOT;?>/members/sendmessage" class="nav-link">
                     <p>Send Message</p>
                 </a>
