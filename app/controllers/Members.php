@@ -265,7 +265,7 @@ class Members extends Controller {
                 }
                 else{
                     flash('member_msg','Something Went Wrong!','alert alert-danger');
-                    redirect('members');
+                    redirect('members?redirect=true');
                 }
             }
             else{
