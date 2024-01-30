@@ -175,4 +175,114 @@ class Groups extends Controller {
             }
          }
     }
+
+    public function membership()
+    {
+        $data = [
+            'groups' => $this->groupModel->getgroups(),
+            'members' => $this->groupModel->GetGroupMembership(),
+        ];
+        $this->view('groups/membership',$data);
+    }
+
+    public function getmembers()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'GET')
+        {
+            $data = [
+                'group' => isset($_GET['group']) && !empty(trim($_GET['group'])) ? (int)trim($_GET['group']) : null,
+                'members' => []
+            ];
+
+            if(is_null($data['group'])){
+                http_response_code(400);
+                echo json_encode(['success' => false,'message' => 'Select group']);
+                exit;
+            }
+            
+            $members = $this->groupModel->GetMembers($data['group']);
+            foreach($members as $member)
+            {
+                array_push($data['members'],['id' => $member->ID,'memberName' => ucwords($member->memberName)]);
+            }
+
+            echo json_encode(['success' => true,'data' => $data['members']]);
+        }
+    }
+
+    public function addmembership()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            $fields = json_decode(file_get_contents('php://input'));
+
+            $data = [
+                'group' => isset($fields->group) && !empty(trim($fields->group)) ? (int)trim($fields->group) : null,
+                'members' => isset($fields->members) && !empty($fields->members) ? $fields->members : null,
+                'errors' => []
+            ];
+
+            if(is_null($data['group'])){
+                http_response_code(400);
+                echo json_encode(['success' => false,'message' => 'Select group','errors' => null]);
+                exit;
+            }
+
+            if(is_null($data['members'])){
+                http_response_code(400);
+                echo json_encode(['success' => false,'message' => 'Select one or more members','errors' => null]);
+                exit;
+            }
+
+            $existing_members = [];
+            $groupmembers = $this->groupModel->GetGroupMembers($data['group']);
+            foreach($groupmembers as $groupmember){
+                array_push($existing_members,$groupmember->memberId);
+            }
+
+            foreach($data['members'] as $member){
+                if(in_array($member,$existing_members)){
+                    array_push($data['errors'], 'Member already added');
+                }
+            }
+            
+            if(count($data['errors']) > 0){
+                http_response_code(400);
+                echo json_encode(['success' => false,'message' => 'One or more members already added to selected group.','errors' => $data['errors']]);
+                exit;
+            }
+         
+
+            if(!$this->groupModel->AddMembership($data)){
+                http_response_code(500);
+                echo json_encode(['success' => false,'message' => 'Unable to save membership at this time','errors' => null]);
+                exit;
+            }
+
+            echo json_encode(['success' => true,'message' => 'Saved successfully.','errors' => null]);
+            exit;
+        }
+    }
+
+    public function deletemembership()
+    {
+        if($_SERVER['REQUEST_METHOD'] === 'POST')
+        {
+            $id = isset($_POST['id']) && !empty(trim($_POST['id'])) ? (int)trim($_POST['id']) : null;
+            if(is_null($id)){
+                flash('groupmember_msg','Select membership to delete','alert alert-danger');
+                redirect('groups/membership');
+                exit;
+            }
+
+            if(!$this->groupModel->DeleteMembership($id)){
+                flash('groupmember_msg','Unable to delete selected membership.','alert alert-danger');
+                redirect('groups/membership');
+                exit;
+            }
+
+            flash('groupmember_msg','Membership deleted successfully.');
+            redirect('groups/membership?redirect=true');
+        }
+    }
 }

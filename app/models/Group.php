@@ -15,6 +15,28 @@ class Group {
         $this->db->bind(':congid',$_SESSION['congId']);
         $this->db->execute();
     }
+    public function getgroups()
+    {
+        return loadresultset($this->db->dbh,'SELECT ID,UCASE(groupName) AS groupName 
+                                             FROM tblgroups 
+                                             WHERE (deleted=0) AND (congregationId=?)',[$_SESSION['congId']]);
+    }
+    public function GetMembers($group)
+    {
+        return loadresultset($this->db->dbh,'SELECT ID,UCASE(memberName) AS memberName 
+                                             FROM tblmember 
+                                             WHERE (deleted=0) AND (congregationId=?) AND ID NOT IN 
+                                             (SELECT memberId FROM tblgroupmembership WHERE (groupId=?))
+                                             ORDER BY memberName',[$_SESSION['congId'],$group]);
+    }
+    public function GetGroupMembers($group)
+    {
+        return loadresultset($this->db->dbh,'SELECT memberId FROM tblgroupmembership WHERE groupId=?',[$group]);
+    }
+    public function GetGroupMembership()
+    {
+        return loadresultset($this->db->dbh,'SELECT * FROM vw_group_memberships WHERE congregationId=?',[$_SESSION['congId']]);
+    }
     public function index()
     {
         $this->db->query("SELECT ID,
@@ -289,5 +311,46 @@ class Group {
             error_log($e->getMessage(),0);
             return false;
         }
+    }
+
+    public function AddMembership($data)
+    {
+        try {
+            $this->db->dbh->beginTransaction();
+
+            foreach($data['members'] as $member)
+            {
+                $this->db->query('INSERT INTO tblgroupmembership (memberId,groupId) VALUES(:member,:group)');
+                $this->db->bind(':member',$member);
+                $this->db->bind(':group',$data['group']);
+                $this->db->execute();
+            }
+
+            if ($this->db->dbh->commit())
+            {
+                return true;
+            }
+            else{
+                return false;
+            }
+
+        } catch (\Exception $e) {
+            if ($this->db->dbh->inTransaction()) {
+                $this->db->dbh->rollback();
+            }
+            error_log($e->getMessage(),0);
+            return false;
+        }
+    }
+
+    public function DeleteMembership($id)
+    {
+        $this->db->query('DELETE FROM tblgroupmembership WHERE (ID=:id)');
+        $this->db->bind(':id',$id);
+        if(!$this->db->execute()){
+            return false;
+        }
+
+        return true;
     }
 }
