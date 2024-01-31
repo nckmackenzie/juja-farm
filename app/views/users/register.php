@@ -83,10 +83,22 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="role">Role</label>
+                                        <select name="role" id="role" class="form-control form-control-sm mandatory">
+                                            <option value="">Select role</option>
+                                            <?php foreach($data['roles'] as $role) : ?>
+                                                <option value="<?php echo $role->ID;?>" <?php selectdCheck($data['role'],$role->ID);?>><?php echo ucwords($role->RoleName);?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <span class="invalid-feedback"></span>
+                                    </div>
+                                </div>
                         </div><!--End Of Row -->
                         <div class="row">
-                            <div class="col-2">
-                            <button type="submit" class="btn btn-block btn-sm bg-navy">Save</button>
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-block btn-sm bg-navy">Save</button>
                             </div>
                         </div>
                     </form>
