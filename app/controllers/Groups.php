@@ -3,6 +3,7 @@
 class Groups extends Controller {
     private $authmodel;
     private $groupModel;
+    private $membermodel;
     public function __construct()
     {
         if (!isset($_SESSION['userId'])) {
@@ -11,6 +12,7 @@ class Groups extends Controller {
         $this->authmodel = $this->model('Auth');
         checkrights($this->authmodel,'groups');
         $this->groupModel = $this->model('Group');
+        $this->membermodel = $this->model('Member');
     }
     public function index()
     {
@@ -180,6 +182,7 @@ class Groups extends Controller {
     {
         $data = [
             'groups' => $this->groupModel->getgroups(),
+            'districts' => $this->membermodel->getDistricts(),
             'members' => $this->groupModel->GetGroupMembership(),
         ];
         $this->view('groups/membership',$data);
@@ -191,6 +194,7 @@ class Groups extends Controller {
         {
             $data = [
                 'group' => isset($_GET['group']) && !empty(trim($_GET['group'])) ? (int)trim($_GET['group']) : null,
+                'district' => isset($_GET['district']) && !empty(trim($_GET['district'])) ? (int)trim($_GET['district']) : null,
                 'members' => []
             ];
 
@@ -199,8 +203,14 @@ class Groups extends Controller {
                 echo json_encode(['success' => false,'message' => 'Select group']);
                 exit;
             }
+
+            if(is_null($data['district'])){
+                http_response_code(400);
+                echo json_encode(['success' => false,'message' => 'Select district']);
+                exit;
+            }
             
-            $members = $this->groupModel->GetMembers($data['group']);
+            $members = $this->groupModel->GetMembers($data['group'],$data['district']);
             foreach($members as $member)
             {
                 array_push($data['members'],['id' => $member->ID,'memberName' => ucwords($member->memberName)]);

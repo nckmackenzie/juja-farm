@@ -21,13 +21,13 @@ class Group {
                                              FROM tblgroups 
                                              WHERE (deleted=0) AND (congregationId=?)',[$_SESSION['congId']]);
     }
-    public function GetMembers($group)
+    public function GetMembers($group,$district)
     {
         return loadresultset($this->db->dbh,'SELECT ID,UCASE(memberName) AS memberName 
                                              FROM tblmember 
-                                             WHERE (deleted=0) AND (congregationId=?) AND ID NOT IN 
+                                             WHERE (deleted=0) AND (congregationId=?) AND (districtId=?) AND ID NOT IN 
                                              (SELECT memberId FROM tblgroupmembership WHERE (groupId=?))
-                                             ORDER BY memberName',[$_SESSION['congId'],$group]);
+                                             ORDER BY memberName',[$_SESSION['congId'],$district,$group]);
     }
     public function GetGroupMembers($group)
     {
