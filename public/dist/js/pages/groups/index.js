@@ -1,16 +1,39 @@
-import { sendHttpRequest, HOST_URL } from '../utils/utils.js';
+import {
+  sendHttpRequest,
+  HOST_URL,
+  setLoadingState,
+  resetLoadingState,
+} from '../utils/utils.js';
 const addBtn = document.querySelector('.btn-success');
 const alertBox = document.querySelector('#alertBox');
 const errorMessage = document.querySelector('.error-message');
 const groupSelect = document.querySelector('#group');
+const districtSelect = document.querySelector('#district');
+const btnSave = document.querySelector('.btnsave');
 const membersSelect = document.querySelector('#members');
 const form = document.querySelector('.add-membership');
+const selectedMembers = [];
+const fetchedMembers = [];
 
 function activateMultiSelect() {
   $(function () {
     $('#members').multiselect({
       includeSelectAllOption: true,
       buttonWidth: '100%',
+      onChange: function (option, checked, select) {
+        var members = $('#members option:selected');
+        $(members).each(function () {
+          const isSelected = selectedMembers.some(
+            member => member.value === $(this).val()
+          );
+          if (!isSelected) {
+            selectedMembers.push({
+              value: $(this).val(),
+              label: $(this).text(),
+            });
+          }
+        });
+      },
     });
   });
 }
@@ -37,7 +60,7 @@ form.addEventListener('submit', async e => {
   }
 
   const data = { group, members: membersArr };
-
+  setLoadingState(btnSave, 'Saving...');
   const response = await sendHttpRequest(
     `${HOST_URL}/groups/addmembership`,
     'POST',
@@ -45,6 +68,7 @@ form.addEventListener('submit', async e => {
     { 'Content-Type': 'application/json' },
     alertBox
   );
+  resetLoadingState(btnSave, 'Add Membership(s)');
 
   if (!response.success) {
     displayError(response.message);
@@ -52,6 +76,7 @@ form.addEventListener('submit', async e => {
   } else {
     $('#members').multiselect('deselectAll', true);
     groupSelect.value = '';
+    window.location.reload();
   }
 });
 
@@ -68,20 +93,75 @@ function clearError() {
 }
 
 groupSelect.addEventListener('change', async function (e) {
-  if (e.target.value === '') return;
-  membersSelect.innerHTML = '';
-  $('#members').multiselect('destroy');
-  let options = '';
+  if (e.target.value === '' || districtSelect.value === '') return;
+  loadMembers();
+  // membersSelect.innerHTML = '';
+  // $('#members').multiselect('destroy');
+  // let options = '';
+
+  // const response = await sendHttpRequest(
+  //   `${HOST_URL}/groups/getmembers?group=${e.target.value}`
+  // );
+  // if (response.success) {
+  //   const { data } = response;
+  //   data.forEach(dt => {
+  //     options = options + `<option value="${dt.id}">${dt.memberName}</option>`;
+  //   });
+  //   membersSelect.innerHTML = options;
+  //   activateMultiSelect();
+  // }
+});
+
+districtSelect.addEventListener('change', async function (e) {
+  if (e.target.value === '' || districtSelect.value === '') return;
+  loadMembers();
+});
+
+async function loadMembers() {
+  const districtValue = districtSelect.value;
+  const groupValue = groupSelect.value;
+  if (
+    !districtValue ||
+    !groupValue ||
+    groupValue.value === '' ||
+    districtValue.value === ''
+  )
+    return;
 
   const response = await sendHttpRequest(
-    `${HOST_URL}/groups/getmembers?group=${e.target.value}`
+    `${HOST_URL}/groups/getmembers?group=${groupValue}&district=${districtValue}`
   );
   if (response.success) {
     const { data } = response;
+    fetchedMembers.splice(0);
     data.forEach(dt => {
-      options = options + `<option value="${dt.id}">${dt.memberName}</option>`;
+      const memberWasSelected = selectedMembers.some(
+        mbr => mbr.value === member.value
+      );
+      if (!memberWasSelected) {
+        fetchedMembers.push({ value: dt.id, label: dt.memberName });
+      }
     });
-    membersSelect.innerHTML = options;
-    activateMultiSelect();
+    const enjoinedMembers = [...selectedMembers, ...fetchedMembers];
+    bindMembers(enjoinedMembers);
   }
-});
+}
+
+function bindMembers(allMembers) {
+  membersSelect.innerHTML = '';
+  $('#members').multiselect('destroy');
+
+  let options = '';
+  allMembers.forEach(member => {
+    const memberWasSelected = selectedMembers.some(
+      mbr => mbr.value === member.value
+    );
+    options =
+      options +
+      `<option value="${member.value}" ${memberWasSelected && 'selected'}>${
+        member.label
+      }</option>`;
+  });
+  membersSelect.innerHTML = options;
+  activateMultiSelect();
+}
