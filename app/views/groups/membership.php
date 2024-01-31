@@ -50,11 +50,22 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label for="">Group</label>
+                    <label for="group">Group</label>
                     <select class="form-control" name="group" id="group">
                         <option value="" selected disabled>Select group...</option>
                         <?php foreach($data['groups'] as $group) : ?>
                             <option value="<?php echo $group->ID;?>"><?php echo $group->groupName;?></option>
+                        <?php endforeach; ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-group">
+                    <label for="district">District</label>
+                    <select class="form-control" name="district" id="district">
+                        <option value="" selected disabled>Select district...</option>
+                        <?php foreach($data['districts'] as $district) : ?>
+                            <option value="<?php echo $district->ID;?>"><?php echo $district->districtName;?></option>
                         <?php endforeach; ?>
                     </select>
                   </div>
@@ -69,8 +80,8 @@
                 </div>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn bg-navy custom-font btnsave">Add Membership(s)</button>
+                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-sm bg-navy btnsave">Add Membership(s)</button>
               </div>
           </form>
       </div>
@@ -132,7 +143,7 @@
 </div><!-- /.content-wrapper -->
 <?php require APPROOT . '/views/inc/footer.php'?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js"></script>
-<script type="module" src="<?php echo URLROOT; ?>/dist/js/pages/groups/index.js"></script>
+<script type="module" src="<?php echo URLROOT; ?>/dist/js/pages/groups/index-v1.js"></script>
 <script>
   $(function(){
       var urlParams = new URLSearchParams(window.location.search);
