@@ -1,19 +1,5 @@
-import {
-  mandatoryFields,
-  clearOnChange,
-  validation,
-  validateDate,
-} from '../utils/utils.js';
-const idNumberInput = document.getElementById('idno');
-const occupationSelect = document.getElementById('occupation');
-const maritalStatusSelect = document.getElementById('maritalstatus');
-const marriageTypeSelect = document.getElementById('marriagetype');
-const dobInput = document.getElementById('dob');
-const marriageDateInput = document.getElementById('dtBoxMarriage');
-const registrationDateInput = document.getElementById('dtBoxRegistration');
-const baptisedDateInput = document.getElementById('dtBoxBaptised');
-const confirmedDateInput = document.getElementById('dtBoxConfirmed');
-const comissionedDateInput = document.getElementById('dtBoxCommissioned');
+import { clearOnChange, mandatoryFields, validation } from '../utils/utils.js';
+
 const form = document.querySelector('form');
 
 let calculateAge = function (birthday) {
